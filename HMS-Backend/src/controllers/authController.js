@@ -279,7 +279,6 @@ const login = async (req, res) => {
         return handleControllerError(res, err, 'login');
     }
 };
-
 /**
  * GET /api/auth/me
  */

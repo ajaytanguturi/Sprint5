@@ -69,15 +69,14 @@ const patientSchema = new mongoose.Schema({
 });
 
 // Auto-generate UHID before saving
-patientSchema.pre('save', async function (next) {
+patientSchema.pre('save', async function () {
     try {
         if (!this.UHID) {
             const seq = await Counter.getNextSequence('UHID');
             this.UHID = `UHID-${String(seq).padStart(4, '0')}`;
         }
-        next();
     } catch (error) {
-        next(error);
+        console.log(error.message);
     }
 });
 

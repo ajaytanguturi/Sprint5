@@ -111,7 +111,7 @@ const appointmentSchema = new mongoose.Schema({
 });
 
 // Auto-generate appointmentId before saving
-appointmentSchema.pre('save', async function (next) {
+appointmentSchema.pre('save', async function () {
     try {
         if (!this.appointmentId) {
             const seq = await Counter.getNextSequence('appointmentId');

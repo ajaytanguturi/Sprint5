@@ -28,37 +28,45 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-  if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) return;
 
-  this.loading = true;
-  this.errorMessage = '';
+    this.loading = true;
+    this.errorMessage = '';
 
-  const { email, password } = this.loginForm.value;
+    const { email, password } = this.loginForm.value;
 
-  this.authService.login(email, password).subscribe({
-    next: (response) => {
-      if (response.success && response.data) {
-        const user = response.data;
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          const user = response.data;
 
-        // Route based on role
-        if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
-          this.router.navigate(['/admin/dashboard']);
-        } else if (user.roles.includes('DOCTOR')) {
-          this.router.navigate(['/doctor/dashboard']);
-        } else if (user.roles.includes('RECEPTIONIST')) {
-          this.router.navigate(['/receptionist/dashboard']);
-        } else {
-          this.router.navigate(['/dashboard']);
+          // Route based on role
+          if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
+            this.router.navigate(['/admin/dashboard']);
+          } else if (user.roles.includes('DOCTOR')) {
+            this.router.navigate(['/doctor/dashboard']);
+          } else if (user.roles.includes('RECEPTIONIST')) {
+            this.router.navigate(['/receptionist/dashboard']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         }
+      },
+      error: (error) => {
+        this.loading = false;
+        const err = error.error;
+        if (err?.requirePasswordReset) {
+          this.router.navigate(['/reset-password']);
+          return;
+        }
+
+        this.errorMessage =
+          err?.message || 'Login failed. Please try again.';
+        this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+      },
+      complete: () => {
+        this.loading = false;
       }
-    },
-    error: (error) => {
-      this.loading = false;
-      this.errorMessage = error.error?.message || 'Login failed. Please try again.';
-    },
-    complete: () => {
-      this.loading = false;
-    }
-  });
-}
+    });
+  }
 }

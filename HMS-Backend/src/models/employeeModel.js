@@ -89,15 +89,15 @@ const employeeSchema = new mongoose.Schema({
     { timestamps: true },
 );
 
-employeeSchema.pre('save', async function (next) {
+employeeSchema.pre('save', async function () {
     try {
         if (!this.employeeCode) {
             const seq = await Counter.getNextSequence('employeeCode');
             this.employeeCode = `EMP-${String(seq).padStart(4, '0')}`;
         }
-        next();
+
     } catch (error) {
-        next(error);
+        console.log(error.message);
     }
 });
 

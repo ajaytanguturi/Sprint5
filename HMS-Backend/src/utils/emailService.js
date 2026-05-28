@@ -8,27 +8,27 @@ brevoClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 const transactionalApi = new Brevo.TransactionalEmailsApi();
 
 const SENDER = {
-    email: process.env.BREVO_SENDER_EMAIL || 'noreply@vanguardhms.com',
-    name: 'Vanguard HMS',
+  email: process.env.BREVO_SENDER_EMAIL || 'noreply@vanguardhms.com',
+  name: 'Vanguard HMS',
 };
 
 // ── Private dispatcher (single source of Brevo boilerplate) ─────────────────
 const dispatch = async (recipientEmail, recipientName, subject, htmlContent) => {
-    const payload = {
-        sender: SENDER,
-        to: [{ email: recipientEmail, name: recipientName || recipientEmail }],
-        subject,
-        htmlContent,
-    };
-    const result = await transactionalApi.sendTransacEmail(payload);
-    console.info(`[Mail] Sent "${subject}" → ${recipientEmail}`);
-    return result;
+  const payload = {
+    sender: SENDER,
+    to: [{ email: recipientEmail, name: recipientName || recipientEmail }],
+    subject,
+    htmlContent,
+  };
+  const result = await transactionalApi.sendTransacEmail(payload);
+  console.info(`[Mail] Sent "${subject}" → ${recipientEmail}`);
+  return result;
 };
 
 // ── Auth / Account emails ────────────────────────────────────────────────────
 
 const sendRegistrationPendingEmail = (email, name) =>
-    dispatch(email, name, 'Registration Received – Pending Approval', `
+  dispatch(email, name, 'Registration Received – Pending Approval', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#0d9488">Welcome to Vanguard HMS!</h2>
           <p>Dear <strong>${name}</strong>,</p>
@@ -38,7 +38,7 @@ const sendRegistrationPendingEmail = (email, name) =>
         </div>`);
 
 const sendAdminNotificationEmail = (adminEmail, staffName, staffEmail) =>
-    dispatch(adminEmail, 'Administrator', 'New Employee Registration – Approval Required', `
+  dispatch(adminEmail, 'Administrator', 'New Employee Registration – Approval Required', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#d97706">New Registration Pending</h2>
           <p>A new employee is waiting for your approval:</p>
@@ -54,7 +54,7 @@ const sendAdminNotificationEmail = (adminEmail, staffName, staffEmail) =>
         </div>`);
 
 const sendApprovalEmail = (email, name, loginUrl) =>
-    dispatch(email, name, 'Account Approved – You Can Now Log In', `
+  dispatch(email, name, 'Account Approved – You Can Now Log In', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#059669">Account Approved!</h2>
           <p>Dear <strong>${name}</strong>,</p>
@@ -67,7 +67,7 @@ const sendApprovalEmail = (email, name, loginUrl) =>
         </div>`);
 
 const sendRejectionEmail = (email, name, reason) =>
-    dispatch(email, name, 'Account Registration Update', `
+  dispatch(email, name, 'Account Registration Update', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#dc2626">Registration Update</h2>
           <p>Dear <strong>${name}</strong>,</p>
@@ -78,7 +78,7 @@ const sendRejectionEmail = (email, name, reason) =>
         </div>`);
 
 const sendTemporaryPasswordEmail = (email, name, tempPassword, resetUrl) =>
-    dispatch(email, name, 'Your Vanguard HMS Account Has Been Created', `
+  dispatch(email, name, 'Your Vanguard HMS Account Has Been Created', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#0d9488">Welcome to Vanguard HMS!</h2>
           <p>Dear <strong>${name}</strong>,</p>
@@ -97,7 +97,7 @@ const sendTemporaryPasswordEmail = (email, name, tempPassword, resetUrl) =>
         </div>`);
 
 const sendPasswordResetEmail = (email, name, resetUrl) =>
-    dispatch(email, name, 'Password Reset Request – Vanguard HMS', `
+  dispatch(email, name, 'Password Reset Request – Vanguard HMS', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#0d9488">Password Reset Request</h2>
           <p>Dear <strong>${name}</strong>,</p>
@@ -113,15 +113,15 @@ const sendPasswordResetEmail = (email, name, resetUrl) =>
 // ── Appointment emails ───────────────────────────────────────────────────────
 
 const formatDate = (date) =>
-    new Date(date).toLocaleDateString('en-IN', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    });
+  new Date(date).toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
 
 const sendAppointmentConfirmationEmail = ({
-    patientEmail, patientName, doctorName, date, timeSlot,
-    department, consultationFee, appointmentId,
+  patientEmail, patientName, doctorName, date, timeSlot,
+  department, consultationFee, appointmentId,
 }) =>
-    dispatch(patientEmail, patientName, 'Appointment Confirmed – Vanguard HMS', `
+  dispatch(patientEmail, patientName, 'Appointment Confirmed – Vanguard HMS', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#0d9488">Appointment Confirmed ✓</h2>
           <p>Dear <strong>${patientName}</strong>,</p>
@@ -139,9 +139,9 @@ const sendAppointmentConfirmationEmail = ({
         </div>`);
 
 const sendAppointmentCancellationEmail = ({
-    patientEmail, patientName, doctorName, date, timeSlot, reason, appointmentId,
+  patientEmail, patientName, doctorName, date, timeSlot, reason, appointmentId,
 }) =>
-    dispatch(patientEmail, patientName, 'Appointment Cancelled – Vanguard HMS', `
+  dispatch(patientEmail, patientName, 'Appointment Cancelled – Vanguard HMS', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#dc2626">Appointment Cancelled</h2>
           <p>Dear <strong>${patientName}</strong>,</p>
@@ -158,9 +158,9 @@ const sendAppointmentCancellationEmail = ({
         </div>`);
 
 const sendAppointmentReminderEmail = ({
-    patientEmail, patientName, doctorName, date, timeSlot, appointmentId,
+  patientEmail, patientName, doctorName, date, timeSlot, appointmentId,
 }) =>
-    dispatch(patientEmail, patientName, 'Appointment Reminder – Tomorrow', `
+  dispatch(patientEmail, patientName, 'Appointment Reminder – Tomorrow', `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#d97706">Appointment Reminder</h2>
           <p>Dear <strong>${patientName}</strong>,</p>
@@ -176,13 +176,13 @@ const sendAppointmentReminderEmail = ({
         </div>`);
 
 module.exports = {
-    sendRegistrationPendingEmail,
-    sendAdminNotificationEmail,
-    sendApprovalEmail,
-    sendRejectionEmail,
-    sendTemporaryPasswordEmail,
-    sendPasswordResetEmail,
-    sendAppointmentConfirmationEmail,
-    sendAppointmentCancellationEmail,
-    sendAppointmentReminderEmail,
+  sendRegistrationPendingEmail,
+  sendAdminNotificationEmail,
+  sendApprovalEmail,
+  sendRejectionEmail,
+  sendTemporaryPasswordEmail,
+  sendPasswordResetEmail,
+  sendAppointmentConfirmationEmail,
+  sendAppointmentCancellationEmail,
+  sendAppointmentReminderEmail,
 };

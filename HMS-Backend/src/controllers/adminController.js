@@ -172,7 +172,9 @@ const createEmployeeWithTempPassword = async (req, res) => {
             status: 'ACTIVE',
             approvalStatus: 'APPROVED',
             isTemporaryPassword: true,
-        }).save();
+        });
+        console.log('Generated userId before save:', user.userId);
+        await user.save();
 
         const resetToken = generatePasswordResetToken({ id: user._id, email: user.email });
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');

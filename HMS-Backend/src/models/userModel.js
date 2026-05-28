@@ -76,20 +76,38 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.userId) {
         const seq = await Counter.getNextSequence('userId');
         this.userId = `USR-${String(seq).padStart(4, '0')}`;
     }
-    next();
 });
 
-userSchema.pre('save', function (next) {
-    const isAdminLevel = this.roles.some((r) => r === 'OWNER' || r === 'ADMIN');
+userSchema.pre('save', function () {
+    const isAdminLevel = this.roles.some(
+        (r) => r === 'OWNER' || r === 'ADMIN'
+    );
+
     if (!isAdminLevel && !this.employeeId) {
-        return next(new Error(`employeeId is required for roles: ${this.roles.join(', ')}`));
+        throw new Error(
+            `employeeId is required for roles: ${this.roles.join(', ')}`
+        );
     }
-    next();
 });
+
+// userSchema.pre('save', async function () {
+//     if (!this.userId) {
+//         const seq = await Counter.getNextSequence('userId');
+//         this.userId = `USR-${String(seq).padStart(4, '0')}`;
+//     }
+// });
+
+// userSchema.pre('save', function (next) {
+//     const isAdminLevel = this.roles.some((r) => r === 'OWNER' || r === 'ADMIN');
+//     if (!isAdminLevel && !this.employeeId) {
+//         return next(new Error(`employeeId is required for roles: ${this.roles.join(', ')}`));
+//     }
+//     next();
+// });
 
 module.exports = mongoose.model('User', userSchema);

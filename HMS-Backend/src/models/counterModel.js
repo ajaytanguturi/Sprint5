@@ -16,7 +16,7 @@ counterSchema.statics.getNextSequence = async function (name) {
     const counter = await this.findByIdAndUpdate(
         name,                        // find counter by name
         { $inc: { seq: 1 } },        // increment seq by 1
-        { new: true, upsert: true }  // create if not exists, return updated doc
+        { returnDocument: 'after', upsert: true }  // create if not exists, return updated doc
     );
     return counter.seq;
 };
