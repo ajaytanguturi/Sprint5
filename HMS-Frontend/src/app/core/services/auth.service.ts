@@ -116,6 +116,23 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  getDashboardRoute(): string {
+    const user = this.getCurrentUser();
+    if (!user) return '/login';
+    
+    if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
+      return '/admin/dashboard';
+    }
+    if (user.roles.includes('RECEPTIONIST')) {
+      return '/receptionist/dashboard';
+    }
+    if (user.roles.includes('DOCTOR')) {
+      return '/doctor/dashboard';
+    }
+    
+    return '/';
+  }
+
   hasRole(roles: Role[]): boolean {
     const user = this.getCurrentUser();
     if (!user) return false;

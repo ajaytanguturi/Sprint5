@@ -302,7 +302,11 @@ export class RegisterComponent {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        if (error.error?.errors && Array.isArray(error.error.errors)) {
+          this.errorMessage = error.error.errors.map((e: any) => `${e.field}: ${e.message}`).join(', ');
+        } else {
+          this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        }
       },
       complete: () => {
         this.loading = false;

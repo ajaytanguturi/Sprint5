@@ -139,7 +139,11 @@ export class ResetPasswordComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error.error?.message || 'Failed to reset password. Link may be expired.';
+        if (error.error?.errors && Array.isArray(error.error.errors)) {
+          this.errorMessage = error.error.errors.map((e: any) => `${e.field}: ${e.message}`).join(', ');
+        } else {
+          this.errorMessage = error.error?.message || 'Failed to reset password. Link may be expired.';
+        }
       },
       complete: () => {
         this.loading = false;

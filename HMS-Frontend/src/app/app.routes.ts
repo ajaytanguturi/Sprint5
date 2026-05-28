@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from './core/services/auth.service';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
@@ -265,7 +267,11 @@ export const routes: Routes = [
   },
 
   // --- Fallback ---
-  { path: 'dashboard', redirectTo: 'doctor/dashboard', pathMatch: 'full' },
+  {
+    path: 'dashboard',
+    redirectTo: () => inject(AuthService).getDashboardRoute(),
+    pathMatch: 'full',
+  },
   { path: 'profile', redirectTo: 'admin/profile', pathMatch: 'full' },
   { path: '**', redirectTo: '' },
 ];

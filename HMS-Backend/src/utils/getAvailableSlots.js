@@ -1,4 +1,6 @@
-const { generateBookableSlots } = require('../utils/slotGenerator');
+const { generateBookableSlots } = require('./slotGenerator');
+const Employee = require('../models/employeeModel');
+const Appointment = require('../models/appointmentModel');
 
 exports.getAvailableSlots = async (req, res) => {
     try {

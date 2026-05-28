@@ -45,9 +45,10 @@ const protect = async (req, res, next) => {
       });
     }
 
+    console.error('Authentication protect middleware error:', error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: 'An unexpected error occurred',
     });
   }
 };

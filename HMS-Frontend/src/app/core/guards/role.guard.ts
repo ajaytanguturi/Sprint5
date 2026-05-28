@@ -17,7 +17,7 @@ export const roleGuard = (allowedRoles: Role[]): CanActivateFn => {
       return true;
     }
 
-    router.navigate(['/dashboard']);
+    router.navigate([authService.getDashboardRoute()]);
     return false;
   };
 };

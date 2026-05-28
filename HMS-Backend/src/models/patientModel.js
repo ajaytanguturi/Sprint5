@@ -75,8 +75,9 @@ patientSchema.pre('save', async function (next) {
             const seq = await Counter.getNextSequence('UHID');
             this.UHID = `UHID-${String(seq).padStart(4, '0')}`;
         }
+        next();
     } catch (error) {
-        throw error;
+        next(error);
     }
 });
 

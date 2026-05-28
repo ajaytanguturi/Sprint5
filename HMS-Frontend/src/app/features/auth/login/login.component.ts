@@ -118,11 +118,7 @@ export class LoginComponent {
           const user = response.data;
           
           // Redirect based on role
-          if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
-            this.router.navigate(['/admin/dashboard']);
-          } else {
-            this.router.navigate(['/dashboard']);
-          }
+          this.router.navigate([this.authService.getDashboardRoute()]);
         }
       },
       error: (error) => {

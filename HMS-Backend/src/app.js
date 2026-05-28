@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const authRoutes = require('./routes/authroutes');
 const adminRoutes = require('./routes/adminRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const patientRoutes = require('./routes/patientRoutes');
@@ -8,7 +10,9 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 
 const app = express();
 
-// Middleware
+// Security and Logging Middleware
+app.use(helmet());
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,12 +34,21 @@ app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Error handler
+// Global Error handler
 app.use((err, req, res, next) => {
-    console.error('Global error:', err);
-    res.status(err.status || 500).json({
+    console.error('Global error handler caught:', err);
+    
+    const statusCode = err.status || err.statusCode || 500;
+    
+    // Prevent leaking sensitive data or database error messages in 500 errors
+    let clientMessage = err.message || 'Internal server error';
+    if (statusCode === 500) {
+        clientMessage = 'An unexpected server error occurred';
+    }
+    
+    res.status(statusCode).json({
         success: false,
-        message: err.message || 'Internal server error',
+        message: clientMessage
     });
 });
 
