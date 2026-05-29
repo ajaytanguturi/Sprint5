@@ -78,8 +78,8 @@ exports.getAllPatients = async (req, res) => {
         if (status) filter.status = status;
         if (gender) filter.gender = gender;
 
-        const pageNum = Math.max(parseInt(page, 10), 1);
-        const limitNum = Math.min(parseInt(limit, 10), 100);
+        const pageNum = Math.max(Number.parseInt(page, 10), 1);
+        const limitNum = Math.min(Number.parseInt(limit, 10), 100);
 
         const [patients, total] = await Promise.all([
             Patient.find(filter)

@@ -118,7 +118,7 @@ appointmentSchema.pre('save', async function () {
             this.appointmentId = `APT-${String(seq).padStart(4, '0')}`;
         }
     } catch (error) {
-        throw error;
+        console.log(error.message);
     }
 });
 

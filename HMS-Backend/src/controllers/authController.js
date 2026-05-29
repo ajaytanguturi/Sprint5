@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const User = require('../models/userModel');
 const Employee = require('../models/employeeModel');
 const {

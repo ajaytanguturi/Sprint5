@@ -2,5 +2,5 @@ projectKey=projecthm
 serverUrl=http://localhost:9000
 serverVersion=26.1.0.118079
 dashboardUrl=http://localhost:9000/dashboard?id=projecthm
-ceTaskId=49cbf411-8e3f-47d4-a1be-1620fdc9e8db
-ceTaskUrl=http://localhost:9000/api/ce/task?id=49cbf411-8e3f-47d4-a1be-1620fdc9e8db
+ceTaskId=441cfb39-a788-4e5b-87b8-1f090439cca0
+ceTaskUrl=http://localhost:9000/api/ce/task?id=441cfb39-a788-4e5b-87b8-1f090439cca0

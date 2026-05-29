@@ -150,8 +150,8 @@ exports.getAllAppointments = async (req, res) => {
         if (department) filter.department = department;
         if (date) filter.date = buildDateRange(date);
 
-        const pageNum = Math.max(parseInt(page, 10), 1);
-        const limitNum = Math.min(parseInt(limit, 10), 100);
+        const pageNum = Math.max(Number.parseInt(page, 10), 1);
+        const limitNum = Math.min(Number.parseInt(limit, 10), 100);
 
         const [appointments, total] = await Promise.all([
             Appointment.find(filter)
@@ -192,8 +192,8 @@ exports.getMyAppointments = async (req, res) => {
         if (status) filter.status = status;
         if (date) filter.date = buildDateRange(date);
 
-        const pageNum = Math.max(parseInt(page, 10), 1);
-        const limitNum = Math.min(parseInt(limit, 10), 100);
+        const pageNum = Math.max(Number.parseInt(page, 10), 1);
+        const limitNum = Math.min(Number.parseInt(limit, 10), 100);
 
         const [appointments, total] = await Promise.all([
             Appointment.find(filter)
@@ -233,8 +233,8 @@ exports.getDoctorAppointments = async (req, res) => {
         if (status) filter.status = status;
         if (date) filter.date = buildDateRange(date);
 
-        const pageNum = Math.max(parseInt(page, 10), 1);
-        const limitNum = Math.min(parseInt(limit, 10), 100);
+        const pageNum = Math.max(Number.parseInt(page, 10), 1);
+        const limitNum = Math.min(Number.parseInt(limit, 10), 100);
 
         const [appointments, total] = await Promise.all([
             Appointment.find(filter)
@@ -502,7 +502,7 @@ exports.getAvailableSlots = async (req, res) => {
 
         if (!date) return res.status(400).json({ success: false, message: 'Query param "date" is required' });
 
-        const slotDuration = parseInt(duration, 10) || 30;
+        const slotDuration = Number.parseInt(duration, 10) || 30;
         if (!SLOT_DURATIONS.includes(slotDuration)) {
             return res.status(400).json({ success: false, message: `Duration must be one of: ${SLOT_DURATIONS.join(', ')} minutes` });
         }

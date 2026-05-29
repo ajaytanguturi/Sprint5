@@ -104,8 +104,8 @@ exports.getEmployees = async (req, res) => {
             ];
         }
 
-        const pageNum = Math.max(parseInt(page, 10), 1);
-        const limitNum = Math.min(parseInt(limit, 10), 100);
+        const pageNum = Math.max(Number.parseInt(page, 10), 1);
+        const limitNum = Math.min(Number.parseInt(limit, 10), 100);
 
         const [employees, total] = await Promise.all([
             Employee.find(filter)

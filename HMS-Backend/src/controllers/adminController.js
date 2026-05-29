@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const User = require('../models/userModel');
 const Employee = require('../models/employeeModel');
 const { generatePasswordResetToken } = require('../utils/generateToken');
@@ -172,9 +172,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
             status: 'ACTIVE',
             approvalStatus: 'APPROVED',
             isTemporaryPassword: true,
-        });
-        console.log('Generated userId before save:', user.userId);
-        await user.save();
+        }).save();
 
         const resetToken = generatePasswordResetToken({ id: user._id, email: user.email });
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');

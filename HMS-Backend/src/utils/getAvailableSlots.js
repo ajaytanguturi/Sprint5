@@ -14,7 +14,7 @@ exports.getAvailableSlots = async (req, res) => {
             });
         }
 
-        const slotDuration = parseInt(duration, 10) || 30;
+        const slotDuration = Number.parseInt(duration, 10) || 30;
 
         if (![15, 30].includes(slotDuration)) {
             return res.status(400).json({
