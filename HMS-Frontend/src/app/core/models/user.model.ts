@@ -60,14 +60,11 @@ export const ROLES: Role[] = [
 
 export const DEPARTMENTS: Department[] = ['OPD', 'IPD', 'Lab', 'Pharmacy', 'Admin'];
 
-// ADD these to your existing user.model.ts file
-
 export interface SidebarItem {
   label: string;
   route: string;
   roles: Role[];
 }
-
 
 export const ADMIN_SIDEBAR: SidebarItem[] = [
   { label: 'Dashboard', route: '/admin/dashboard', roles: ['ADMIN', 'OWNER'] },
@@ -79,7 +76,7 @@ export const ADMIN_SIDEBAR: SidebarItem[] = [
   { label: 'Appointments', route: '/admin/appointments', roles: ['ADMIN', 'OWNER'] },
   //{ label: 'Today\'s Appointments', route: '/admin/appointments/today', roles: ['ADMIN', 'OWNER'] },
   //{ label: 'Book Appointment', route: '/admin/book-appointment', roles: ['ADMIN', 'OWNER'] },
-  //{ label: 'Profile', route: '/admin/profile', roles: ['ADMIN', 'OWNER'] },
+  { label: 'Profile', route: '/admin/profile', roles: ['ADMIN', 'OWNER'] },
 ];
 
 export const RECEPTIONIST_SIDEBAR: SidebarItem[] = [

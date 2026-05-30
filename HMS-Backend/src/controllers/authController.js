@@ -16,7 +16,7 @@ const {
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const VALID_ROLES = ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST'];
-const ADMIN_ROLES = ['OWNER', 'ADMIN'];
+const ADMIN_ROLES = new Set(['OWNER', 'ADMIN']);
 const SALT_ROUNDS = 12;
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ const validateRoles = (roles) => {
     return arr;
 };
 
-const isAdminLevel = (roles) => roles.some((r) => ADMIN_ROLES.includes(r));
+const isAdminLevel = (roles) => roles.some((r) => ADMIN_ROLES.has(r));
 
 const handleControllerError = (res, error, context) => {
     console.error(`[${context}]`, error.message);
@@ -172,6 +172,7 @@ const selfRegister = async (req, res) => {
             phone,
             email: normalizedEmail,
             department,
+
             designation,
             medicalRegistrationNo: medicalRegistrationNo?.trim() || undefined,
             specialization,
@@ -346,12 +347,10 @@ const forgotPassword = async (req, res) => {
  */
 const resetPassword = async (req, res) => {
     try {
+        console.log(req.body);
         const { token, newPassword } = req.body;
-
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
         const user = await User.findOne({
-            resetPasswordToken: hashedToken,
+            resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() },
         }).select('+resetPasswordToken +resetPasswordExpires');
 

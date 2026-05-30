@@ -10,7 +10,7 @@ const {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const ADMIN_ROLES = ['ADMIN', 'OWNER'];
+const ADMIN_ROLES = new Set(['ADMIN', 'OWNER']);
 const VALID_STATUSES = ['BOOKED', 'CANCELLED', 'COMPLETED'];
 const SLOT_DURATIONS = [15, 30];
 
@@ -20,7 +20,7 @@ const CREATOR_FIELDS = 'email userId';
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
 
-const isAdmin = (user) => user.roles.some((r) => ADMIN_ROLES.includes(r));
+const isAdmin = (user) => user.roles.some((r) => ADMIN_ROLES.has(r));
 
 const creatorFilter = (user) => (isAdmin(user) ? {} : { createdByEmployeeId: user.id });
 
@@ -98,7 +98,9 @@ exports.createAppointment = async (req, res) => {
             });
         }
 
-        const fee = consultationFee !== undefined ? consultationFee : doctor.consultationFee || 0;
+        const fee = consultationFee === undefined
+            ? (doctor.consultationFee || 0)
+            : consultationFee;
 
         const appointment = await new Appointment({
             patientId: patient._id,
@@ -320,7 +322,25 @@ exports.getTodayAppointments = async (req, res) => {
  */
 exports.getAppointmentById = async (req, res) => {
     try {
-        const filter = { _id: req.params.id, ...creatorFilter(req.user) };
+        let filter = { _id: req.params.id };
+
+        if (!isAdmin(req.user)) {
+            if (req.user.roles.includes('DOCTOR')) {
+                const currentUser = await User.findById(req.user.id);
+                if (!currentUser?.employeeId) {
+                    return res.status(404).json({ success: false, message: 'Employee record not found for this user' });
+                }
+                filter = {
+                    _id: req.params.id,
+                    $or: [
+                        { doctorEmployeeId: currentUser.employeeId },
+                        { createdByEmployeeId: req.user.id },
+                    ],
+                };
+            } else {
+                filter = { _id: req.params.id, ...creatorFilter(req.user) };
+            }
+        }
 
         const appointment = await Appointment.findOne(filter)
             .populate('patientId', 'UHID name phone email gender age dob address medicalHistory')
@@ -378,7 +398,7 @@ exports.updateAppointmentStatus = async (req, res) => {
 exports.addDoctorNotes = async (req, res) => {
     try {
         const { doctorNotes, diagnosis, prescription } = req.body;
-
+        console.log('PUT /api/appointments/:id/notes id=', req.params.id);
         const appointment = await Appointment.findById(req.params.id);
         if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
 
@@ -410,10 +430,12 @@ exports.addDoctorNotes = async (req, res) => {
 exports.cancelAppointment = async (req, res) => {
     try {
         const { cancellationReason } = req.body;
-
+        console.log('Appointment ID from URL:', req.params.id);
         const appointment = await Appointment.findById(req.params.id)
             .populate('patientId', 'UHID name email')
             .populate('doctorEmployeeId', 'name');
+        console.log('Appointment found:', appointment);
+
 
         if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
         if (appointment.status === 'CANCELLED') return res.status(400).json({ success: false, message: 'Appointment is already cancelled' });

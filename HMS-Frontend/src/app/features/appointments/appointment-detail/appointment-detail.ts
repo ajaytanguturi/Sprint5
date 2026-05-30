@@ -43,7 +43,7 @@ export class AppointmentDetailComponent implements OnInit {
     });
   }
 
-  // ✅ Replaced confirm + alert with modal + toast
+  // Replaced confirm + alert with modal + toast
   async completeAppointment(): Promise<void> {
     if (!this.appointment) return;
 
@@ -74,7 +74,7 @@ export class AppointmentDetailComponent implements OnInit {
     });
   }
 
-  // ✅ Replaced prompt + alert with modal (with input) + toast
+  // Replaced prompt + alert with modal (with input) + toast
   async cancelAppointment(): Promise<void> {
     if (!this.appointment) return;
 
@@ -123,20 +123,20 @@ export class AppointmentDetailComponent implements OnInit {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'BOOKED':    return 'status-booked';
+      case 'BOOKED': return 'status-booked';
       case 'COMPLETED': return 'status-completed';
       case 'CANCELLED': return 'status-cancelled';
-      default:          return '';
+      default: return '';
     }
   }
 
-  isDoctor(): boolean   { return this.authService.hasRole(['DOCTOR']); }
-  canCancel(): boolean  { return this.authService.hasRole(['RECEPTIONIST', 'ADMIN', 'OWNER']); }
+  isDoctor(): boolean { return this.authService.hasRole(['DOCTOR']); }
+  canCancel(): boolean { return this.authService.hasRole(['RECEPTIONIST', 'ADMIN', 'OWNER']); }
   canAddNotes(): boolean { return this.authService.hasRole(['DOCTOR', 'ADMIN', 'OWNER']); }
 
   private getBasePath(): string {
     if (this.authService.hasRole(['ADMIN', 'OWNER'])) return '/admin';
-    if (this.authService.hasRole(['DOCTOR']))          return '/doctor';
+    if (this.authService.hasRole(['DOCTOR'])) return '/doctor';
     return '/receptionist';
   }
 }

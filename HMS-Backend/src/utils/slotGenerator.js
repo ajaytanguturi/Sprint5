@@ -44,7 +44,7 @@ const mergeRanges = (ranges) => {
     const merged = [parsed[0]];
 
     for (let i = 1; i < parsed.length; i++) {
-        const last = merged[merged.length - 1];
+        const last = merged.at(-1);
         const curr = parsed[i];
 
         if (curr.start <= last.end) {
@@ -101,7 +101,9 @@ const generateBookableSlots = (availabilitySlots, bookedSlots, duration = 30) =>
     }
 
     // Step 3: Deduplicate (shouldn't be needed after merge, but belt-and-suspenders)
-    const uniqueSlots = [...new Set(allSlots)].sort();
+    const uniqueSlots = [...new Set(allSlots)].sort((a, b) =>
+        a.localeCompare(b)
+    );
 
     // Step 4: Filter out slots that overlap with any booked slot
     const booked = bookedSlots || [];

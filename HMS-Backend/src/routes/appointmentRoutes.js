@@ -66,7 +66,7 @@ const cancelRules = [
 const notesRules = [
     body()
         .custom((_, { req }) => {
-            const { doctorNotes, diagnosis, prescription } = req.body;
+            const { doctorNotes, diagnosis, prescription } = req.body || {};
             if (!doctorNotes && !diagnosis && !prescription) {
                 throw new Error('At least one field (doctorNotes, diagnosis, prescription) is required');
             }

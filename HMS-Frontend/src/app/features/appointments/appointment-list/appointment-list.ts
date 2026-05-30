@@ -193,7 +193,7 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
-  // ✅ Clean async/await with modal
+  // Clean async/await with modal
   async completeAppointment(appointmentId: string): Promise<void> {
     const result = await this.confirmModal.open({
       title: 'Complete Appointment',

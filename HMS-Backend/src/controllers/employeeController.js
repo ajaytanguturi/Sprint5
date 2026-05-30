@@ -176,7 +176,7 @@ exports.updateEmployee = async (req, res) => {
 
         if (updates.email) updates.email = updates.email.toLowerCase().trim();
         if (updates.qualification) {
-            updates.qualification = updates.qualification.filter((q) => q && q.trim());
+            updates.qualification = updates.qualification.filter((q) => q?.trim());
         }
 
         const employee = await Employee.findByIdAndUpdate(id, updates, {
