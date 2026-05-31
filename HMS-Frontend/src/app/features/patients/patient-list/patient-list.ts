@@ -16,11 +16,11 @@ import { ConfirmModalService } from '../../../core/services/confirm-modal.servic
   styleUrl: './patient-list.scss'
 })
 export class PatientListComponent implements OnInit {
-  private patientService = inject(PatientService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-  private confirmModal = inject(ConfirmModalService);
+  private readonly patientService = inject(PatientService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
+  private readonly confirmModal = inject(ConfirmModalService);
 
   patients: Patient[] = [];
   loading = false;

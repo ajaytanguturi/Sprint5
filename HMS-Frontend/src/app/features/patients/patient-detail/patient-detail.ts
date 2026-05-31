@@ -16,12 +16,12 @@ import { Appointment } from '../../../core/models/appointment.model';
   styleUrl: './patient-detail.scss'
 })
 export class PatientDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private patientService = inject(PatientService);
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
-  private fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly patientService = inject(PatientService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
 
   patient: Patient | null = null;
   appointments: Appointment[] = [];

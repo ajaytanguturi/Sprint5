@@ -9,7 +9,7 @@ import { Patient } from '../models/patient.model';
   providedIn: 'root'
 })
 export class PatientService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/patients`;
 
   createPatient(data: any): Observable<ApiResponse<Patient>> {

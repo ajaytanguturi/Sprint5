@@ -15,12 +15,12 @@ import { Appointment } from '../../../core/models/appointment.model';
   styleUrl: './appointment-detail.scss'
 })
 export class AppointmentDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
-  private toastService = inject(ToastService);
-  private confirmModal = inject(ConfirmModalService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
+  private readonly confirmModal = inject(ConfirmModalService);
 
   appointment: Appointment | null = null;
   loading = true;

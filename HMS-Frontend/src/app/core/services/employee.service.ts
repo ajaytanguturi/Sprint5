@@ -13,8 +13,8 @@ export interface EmployeeFilters {
   providedIn: 'root'
 })
 export class EmployeeService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/employees`;
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/employees`;
 
   /**
    * Get employees with search, filter & pagination.

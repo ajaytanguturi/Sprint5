@@ -9,7 +9,7 @@ import { Appointment, AvailableDoctor, AvailableSlots } from '../models/appointm
   providedIn: 'root'
 })
 export class AppointmentService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/appointments`;
 
   // --- Appointment CRUD ---

@@ -15,6 +15,7 @@
     display: flex;
     justify-content: flex-end;
     margin-top: $spacing-6;
+    margin-top: 20px;
 }
 
 /* Append these styles to admin-create-employee.scss */
@@ -121,9 +122,4 @@
     background: #dbeafe;
     border-color: #3b82f6;
     color: #1e40af;
-}
-
-/* Form actions */
-.form-actions {
-    margin-top: 20px;
 }

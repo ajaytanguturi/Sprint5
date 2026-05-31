@@ -14,10 +14,10 @@ import { GENDERS } from '../../../core/models/patient.model';
   styleUrl: './patient-create.scss'
 })
 export class PatientCreateComponent {
-  private fb = inject(FormBuilder);
-  private patientService = inject(PatientService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly patientService = inject(PatientService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   patientForm: FormGroup;
   loading = false;

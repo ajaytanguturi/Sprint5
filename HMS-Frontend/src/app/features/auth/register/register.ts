@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ROLES, Role, DEPARTMENTS, Department } from '../../../core/models/user.model';
+import { ROLES, Role, DEPARTMENTS } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -13,9 +13,9 @@ import { ROLES, Role, DEPARTMENTS, Department } from '../../../core/models/user.
   styleUrls: ['./register.scss'],
 })
 export class RegisterComponent {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   registerForm: FormGroup;
   loading = false;
@@ -27,7 +27,6 @@ export class RegisterComponent {
   selectedRole: Role | null = null;
   showMedicalFields = false;
 
-  // ── ★ NEW: Chip-based arrays ★ ──────────────────────────────
   qualificationChips: string[] = [];
   newQualification = '';
 
@@ -45,6 +44,7 @@ export class RegisterComponent {
   ];
 
   constructor() {
+    
     this.registerForm = this.fb.group(
       {
         name: ['', Validators.required],

@@ -17,12 +17,12 @@ import { DEPARTMENTS } from '../../../core/models/user.model';
   styleUrl: './appointment-create.scss'
 })
 export class AppointmentCreateComponent implements OnInit {
-  private patientService = inject(PatientService);
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private fb = inject(FormBuilder);
+  private readonly patientService = inject(PatientService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
 
   // Wizard step
   currentStep = 1;

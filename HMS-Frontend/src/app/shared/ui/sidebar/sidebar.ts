@@ -12,8 +12,8 @@ import { SidebarItem } from '../../../core/models/user.model';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   @Input() menuItems: SidebarItem[] = [];
   @Input() title: string = 'HMS';

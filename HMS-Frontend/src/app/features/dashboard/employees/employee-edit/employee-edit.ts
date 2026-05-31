@@ -14,10 +14,10 @@ import { Employee } from '../../../../core/models/employee.model';
   styleUrl: './employee-edit.scss',   // ★ FIXED: singular, not styleUrls
 })
 export class EmployeeEditComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private employeeService = inject(EmployeeService);
-  private toastService = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly employeeService = inject(EmployeeService);
+  private readonly toastService = inject(ToastService);
 
   employeeId: string = '';
   loading = true;

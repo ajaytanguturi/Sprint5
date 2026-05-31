@@ -81,8 +81,8 @@ import { AuthService } from '../../../core/services/auth.service';
   `
 })
 export class ForgotPasswordComponent {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
 
   forgotPasswordForm: FormGroup;
   loading = false;

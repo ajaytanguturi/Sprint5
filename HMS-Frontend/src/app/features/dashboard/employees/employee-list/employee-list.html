@@ -27,8 +27,8 @@
   @if (!showSearchResults) {
   <div class="filters-section">
     <div class="filter-group">
-      <label class="filter-label">Status:</label>
-      <select [(ngModel)]="statusFilter" (change)="onFilterChange()" class="filter-select">
+      <label for="statusFilter" class="filter-label">Status:</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()" class="filter-select">
         <option value="">All</option>
         <option value="ACTIVE">Active</option>
         <option value="INACTIVE">Inactive</option>
@@ -36,8 +36,8 @@
     </div>
 
     <div class="filter-group">
-      <label class="filter-label">Department:</label>
-      <select [(ngModel)]="departmentFilter" (change)="onFilterChange()" class="filter-select">
+      <label for="departmentFilter" class="filter-label">Department:</label>
+      <select id="departmentFilter" [(ngModel)]="departmentFilter" (change)="onFilterChange()" class="filter-select">
         <option value="">All</option>
         <option value="OPD">OPD</option>
         <option value="IPD">IPD</option>
@@ -127,13 +127,6 @@
                 <button (click)="editEmployee(emp._id!)" class="btn btn-primary btn-sm">
                   Edit
                 </button>
-                <!-- <button
-                      (click)="toggleStatus(emp)"
-                      [class]="emp.status === 'ACTIVE'
-                        ? 'btn btn-warning btn-sm'
-                        : 'btn btn-success btn-sm'">
-                      {{ emp.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
-                    </button> -->
               </div>
             </td>
           </tr>

@@ -15,9 +15,9 @@ import { Appointment } from '../../../core/models/appointment.model';
   styleUrl: './receptionist.scss'
 })
 export class ReceptionistDashboardComponent implements OnInit {
-  private appointmentService = inject(AppointmentService);
-  private patientService = inject(PatientService);
-  private router = inject(Router);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly patientService = inject(PatientService);
+  private readonly router = inject(Router);
 
   sidebarItems = RECEPTIONIST_SIDEBAR;
   todayAppointments: Appointment[] = [];

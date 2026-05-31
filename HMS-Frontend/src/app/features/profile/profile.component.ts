@@ -140,7 +140,7 @@ import { AuthService } from '../../core/services/auth.service';
   `,
 })
 export class ProfileComponent implements OnInit {
-  private authService = inject(AuthService);
+  private readonly authService = inject(AuthService);
 
   user: any = null;
   employee: any = null;

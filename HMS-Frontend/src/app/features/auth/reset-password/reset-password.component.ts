@@ -87,10 +87,10 @@ import { AuthService } from '../../../core/services/auth.service';
   `
 })
 export class ResetPasswordComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   resetPasswordForm: FormGroup;
   loading = false;
@@ -107,7 +107,7 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
-    
+
     if (!this.token) {
       this.errorMessage = 'Invalid reset link';
     }
@@ -116,7 +116,7 @@ export class ResetPasswordComponent implements OnInit {
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('newPassword');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };
     }

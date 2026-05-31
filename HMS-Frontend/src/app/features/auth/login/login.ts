@@ -12,9 +12,9 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./login.scss']
 })
 export class LoginComponent {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   loginForm: FormGroup;
   loading = false;

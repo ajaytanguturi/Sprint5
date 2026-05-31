@@ -15,10 +15,10 @@ import { ToastService } from '../../../../core/services/toast.service';
   styleUrl: './employee-list.scss',
 })
 export class EmployeeListComponent implements OnInit {
-  private employeeService = inject(EmployeeService);
-  private router = inject(Router);
-  private confirmModal = inject(ConfirmModalService);
-  private toastService = inject(ToastService);
+  private readonly employeeService = inject(EmployeeService);
+  private readonly router = inject(Router);
+  private readonly confirmModal = inject(ConfirmModalService);
+  private readonly toastService = inject(ToastService);
 
   // ── Data ────────────────────────────────────────────────────
   employees: Employee[] = [];

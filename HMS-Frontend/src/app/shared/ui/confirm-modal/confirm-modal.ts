@@ -33,4 +33,7 @@ export class ConfirmModalComponent {
       this.onCancel();
     }
   }
+  onBackdropKeydown(): void {
+    this.onBackdropClick(new MouseEvent('click'));
+  }
 }

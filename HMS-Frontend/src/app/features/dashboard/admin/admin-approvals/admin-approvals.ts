@@ -15,9 +15,9 @@ import { ADMIN_SIDEBAR } from '../../../../core/models/user.model';
   styleUrl: './admin-approvals.scss'
 })
 export class AdminApprovalsComponent implements OnInit {
-  private adminService = inject(AdminService);
-  private toastService = inject(ToastService);
-  private confirmModal = inject(ConfirmModalService);
+  private readonly adminService = inject(AdminService);
+  private readonly toastService = inject(ToastService);
+  private readonly confirmModal = inject(ConfirmModalService);
 
   sidebarItems = ADMIN_SIDEBAR;
   pendingApprovals: PendingApproval[] = [];

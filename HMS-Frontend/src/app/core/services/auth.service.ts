@@ -10,11 +10,11 @@ import { LoginResponse, User, Role } from '../models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+
+  private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
+  public readonly currentUser$ = this.currentUserSubject.asObservable();
 
   // Modern signal-based approach (optional)
   currentUserSignal = signal<User | null>(null);
@@ -67,7 +67,7 @@ export class AuthService {
   private setSession(authResult: LoginResponse): void {
     localStorage.setItem('access_token', authResult.tokens.accessToken);
     localStorage.setItem('refresh_token', authResult.tokens.refreshToken);
-    
+
     const user: User = {
       userId: authResult.userId,
       email: authResult.email,
@@ -76,7 +76,7 @@ export class AuthService {
       employee: authResult.employee,
       lastLoginAt: authResult.lastLoginAt,
     };
-    
+
     localStorage.setItem('current_user', JSON.stringify(user));
     this.currentUserSubject.next(user);
     this.currentUserSignal.set(user);
@@ -119,7 +119,7 @@ export class AuthService {
   getDashboardRoute(): string {
     const user = this.getCurrentUser();
     if (!user) return '/login';
-    
+
     if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
       return '/admin/dashboard';
     }
@@ -129,7 +129,7 @@ export class AuthService {
     if (user.roles.includes('DOCTOR')) {
       return '/doctor/dashboard';
     }
-    
+
     return '/';
   }
 

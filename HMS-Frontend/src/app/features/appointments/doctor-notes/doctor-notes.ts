@@ -14,11 +14,11 @@ import { Appointment } from '../../../core/models/appointment.model';
   styleUrl: './doctor-notes.scss'
 })
 export class DoctorNotesComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
-  private fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
 
   appointment: Appointment | null = null;
   notesForm!: FormGroup;

@@ -11,8 +11,8 @@
 
           <!-- Name -->
           <div class="form-group">
-            <label class="form-label">Full Name *</label>
-            <input type="text" formControlName="name" class="form-input" placeholder="John Doe" />
+            <label for="name" class="form-label">Full Name *</label>
+            <input type="text" id="name" formControlName="name" class="form-input" placeholder="John Doe" />
             @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
             <p class="form-error">Name is required</p>
             }
@@ -20,8 +20,9 @@
 
           <!-- Email -->
           <div class="form-group">
-            <label class="form-label">Email *</label>
-            <input type="email" formControlName="email" class="form-input" placeholder="john.doe@hospital.com" />
+            <label for="email" class="form-label">Email *</label>
+            <input type="email" id="email" formControlName="email" class="form-input"
+              placeholder="john.doe@hospital.com" />
             @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
             <p class="form-error">Valid email is required</p>
             }
@@ -29,8 +30,8 @@
 
           <!-- Phone -->
           <div class="form-group">
-            <label class="form-label">Phone *</label>
-            <input type="tel" formControlName="phone" class="form-input" placeholder="+1234567890" />
+            <label for="phone" class="form-label">Phone *</label>
+            <input type="tel" id="phone" formControlName="phone" class="form-input" placeholder="+1234567890" />
             @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
             <p class="form-error">Phone is required</p>
             }
@@ -38,8 +39,8 @@
 
           <!-- Department -->
           <div class="form-group">
-            <label class="form-label">Department *</label>
-            <select formControlName="department" class="form-select">
+            <label for="department" class="form-label">Department *</label>
+            <select id="department" formControlName="department" class="form-select">
               <option value="">Select Department</option>
               @for (dept of departments; track dept) {
               <option [value]="dept">{{ dept }}</option>
@@ -52,8 +53,8 @@
 
           <!-- Role -->
           <div class="form-group">
-            <label class="form-label">Role *</label>
-            <select formControlName="roles" (change)="onRoleChange()" class="form-select">
+            <label for="roles" class="form-label">Role *</label>
+            <select id="roles" formControlName="roles" (change)="onRoleChange()" class="form-select">
               <option value="">Select Role</option>
               @for (role of roles; track role) {
               <option [value]="role">{{ role }}</option>
@@ -66,8 +67,9 @@
 
           <!-- Designation -->
           <div class="form-group">
-            <label class="form-label">Designation *</label>
-            <input type="text" formControlName="designation" class="form-input" placeholder="Senior Doctor" />
+            <label for="designation" class="form-label">Designation *</label>
+            <input type="text" id="designation" formControlName="designation" class="form-input"
+              placeholder="Senior Doctor" />
             @if (registerForm.get('designation')?.invalid && registerForm.get('designation')?.touched) {
             <p class="form-error">Designation is required</p>
             }
@@ -76,8 +78,9 @@
           <!-- Medical Registration No (Conditional) -->
           @if (showMedicalFields) {
           <div class="form-group">
-            <label class="form-label">Medical Registration No</label>
-            <input type="text" formControlName="medicalRegistrationNo" class="form-input" placeholder="MED123456" />
+            <label for="medicalRegistrationNo" class="form-label">Medical Registration No</label>
+            <input type="text" id="medicalRegistrationNo" formControlName="medicalRegistrationNo" class="form-input"
+              placeholder="MED123456" />
           </div>
           }
 
@@ -85,20 +88,22 @@
           @if (selectedRole === 'DOCTOR') {
           <!-- Specialization -->
           <div class="form-group">
-            <label class="form-label">Specialization</label>
-            <input type="text" formControlName="specialization" class="form-input" placeholder="Cardiology" />
+            <label for="specialization" class="form-label">Specialization</label>
+            <input type="text" id="specialization" formControlName="specialization" class="form-input"
+              placeholder="Cardiology" />
           </div>
 
           <!-- Consultation Fee -->
           <div class="form-group">
-            <label class="form-label">Consultation Fee (₹)</label>
-            <input type="number" formControlName="consultationFee" class="form-input" placeholder="500" />
+            <label for="consultationFee" class="form-label">Consultation Fee (₹)</label>
+            <input type="number" id="consultationFee" formControlName="consultationFee" class="form-input"
+              placeholder="500" />
           </div>
           }
 
           <!-- ── ★ QUALIFICATIONS (chip-based, all roles) ★ ───── -->
           <div class="form-group form-group-full">
-            <label class="form-label">Qualifications</label>
+            <label for="qualifications" class="form-label">Qualifications</label>
             <div class="chip-list">
               @for (chip of qualificationChips; track chip; let i = $index) {
               <span class="chip">
@@ -108,8 +113,8 @@
               }
             </div>
             <div class="chip-add-row">
-              <input type="text" [(ngModel)]="newQualification" [ngModelOptions]="{ standalone: true }"
-                class="form-input chip-input" placeholder="e.g. MBBS, MD"
+              <input type="text" id="qualifications" [(ngModel)]="newQualification"
+                [ngModelOptions]="{ standalone: true }" class="form-input chip-input" placeholder="e.g. MBBS, MD"
                 (keyup.enter)="addQualification(); $event.preventDefault()" />
               <button type="button" (click)="addQualification()" class="btn btn-secondary btn-sm">Add</button>
             </div>
@@ -118,7 +123,7 @@
           <!-- ── ★ AVAILABILITY SLOTS (chip-based, DOCTOR only) ★ ─ -->
           @if (selectedRole === 'DOCTOR') {
           <div class="form-group form-group-full">
-            <label class="form-label">Availability Slots</label>
+            <label for="availabilitySlots" class="form-label">Availability Slots</label>
             <p class="section-hint">
               Add time slots in HH:MM-HH:MM format (e.g. 09:00-12:00)
             </p>
@@ -135,8 +140,8 @@
 
             <!-- Custom input -->
             <div class="chip-add-row">
-              <input type="text" [(ngModel)]="newAvailabilitySlot" [ngModelOptions]="{ standalone: true }"
-                class="form-input chip-input" placeholder="e.g. 09:00-12:00"
+              <input type="text" id="availabilitySlots" [(ngModel)]="newAvailabilitySlot"
+                [ngModelOptions]="{ standalone: true }" class="form-input chip-input" placeholder="e.g. 09:00-12:00"
                 (keyup.enter)="addAvailabilitySlot(); $event.preventDefault()" />
               <button type="button" (click)="addAvailabilitySlot()" class="btn btn-secondary btn-sm">Add</button>
             </div>
@@ -158,8 +163,9 @@
 
           <!-- Password -->
           <div class="form-group">
-            <label class="form-label">Password *</label>
-            <input type="password" formControlName="password" class="form-input" placeholder="Min 8 characters" />
+            <label for="password" class="form-label">Password *</label>
+            <input type="password" id="password" formControlName="password" class="form-input"
+              placeholder="Min 8 characters" />
             @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
             <p class="form-error">Password must be at least 8 characters</p>
             }
@@ -167,8 +173,8 @@
 
           <!-- Confirm Password -->
           <div class="form-group">
-            <label class="form-label">Confirm Password *</label>
-            <input type="password" formControlName="confirmPassword" class="form-input"
+            <label for="confirmPassword" class="form-label">Confirm Password *</label>
+            <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-input"
               placeholder="Confirm password" />
             @if (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
             <p class="form-error">Passwords do not match</p>

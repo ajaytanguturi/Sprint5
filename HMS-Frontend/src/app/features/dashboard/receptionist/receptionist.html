@@ -1,9 +1,4 @@
-<app-dashboard-layout
-  [menuItems]="sidebarItems"
-  title="HMS"
-  subtitle="Reception"
-  pageTitle="Dashboard"
->
+<app-dashboard-layout [menuItems]="sidebarItems" title="HMS" subtitle="Reception" pageTitle="Dashboard">
   <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-card stat-accent" (click)="navigateTo('/receptionist/appointments/today')">
@@ -27,7 +22,9 @@
   </div>
 
   <!-- Quick Actions -->
-  <div class="section-header"><h2>Quick Actions</h2></div>
+  <div class="section-header">
+    <h2>Quick Actions</h2>
+  </div>
   <div class="actions-grid">
     <button class="action-card" (click)="navigateTo('/receptionist/book-appointment')">
       <span class="action-label">Book Appointment</span>
@@ -42,29 +39,35 @@
 
   <!-- Today's Appointments Preview -->
   @if (todayAppointments.length > 0) {
-    <div class="section-header">
-      <h2>Today's Appointments</h2>
-      <button (click)="navigateTo('/receptionist/appointments/today')" class="btn btn-secondary btn-sm">View All</button>
+  <div class="section-header">
+    <h2>Today's Appointments</h2>
+    <button (click)="navigateTo('/receptionist/appointments/today')" class="btn btn-secondary btn-sm">View All</button>
+  </div>
+  <div class="card">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (apt of todayAppointments.slice(0, 5); track apt._id) {
+          <tr>
+            <td><span class="code-badge">{{ apt.appointmentId }}</span></td>
+            <td>{{ apt.patientId?.name }}</td>
+            <td>Dr. {{ apt.doctorEmployeeId?.name }}</td>
+            <td><span class="time-badge">{{ apt.timeSlot }}</span></td>
+            <td><span [class]="'status-badge status-' + apt.status.toLowerCase()">{{ apt.status }}</span></td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
-    <div class="card">
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Time</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            @for (apt of todayAppointments.slice(0, 5); track apt._id) {
-              <tr>
-                <td><span class="code-badge">{{ apt.appointmentId }}</span></td>
-                <td>{{ apt.patientId?.name }}</td>
-                <td>Dr. {{ apt.doctorEmployeeId?.name }}</td>
-                <td><span class="time-badge">{{ apt.timeSlot }}</span></td>
-                <td><span [class]="'status-badge status-' + apt.status.toLowerCase()">{{ apt.status }}</span></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+  </div>
   }
 </app-dashboard-layout>

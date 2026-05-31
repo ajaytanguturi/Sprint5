@@ -128,8 +128,8 @@ import { User } from '../../../core/models/user.model';
   `
 })
 export class NavbarComponent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   currentUser: User | null = null;
   userMenuOpen = false;

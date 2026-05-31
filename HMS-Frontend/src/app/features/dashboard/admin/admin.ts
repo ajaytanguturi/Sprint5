@@ -1,13 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardLayoutComponent } from '../../../shared/ui/dashboard-layout/dashboard-layout';
 import { AdminService } from '../../../core/services/admin.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { PatientService } from '../../../core/services/patient.service';
-import { PendingApproval } from '../../../core/models/api-response.model';
-import { ADMIN_SIDEBAR, ROLES, DEPARTMENTS } from '../../../core/models/user.model';
+import { ADMIN_SIDEBAR } from '../../../core/models/user.model';
 import { Appointment } from '../../../core/models/appointment.model';
 
 @Component({
@@ -18,10 +17,10 @@ import { Appointment } from '../../../core/models/appointment.model';
   styleUrl: './admin.scss'
 })
 export class AdminDashboardComponent implements OnInit {
-  private adminService = inject(AdminService);
-  private appointmentService = inject(AppointmentService);
-  private patientService = inject(PatientService);
-  private router = inject(Router);
+  private readonly adminService = inject(AdminService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly patientService = inject(PatientService);
+  private readonly router = inject(Router);
 
   sidebarItems = ADMIN_SIDEBAR;
 

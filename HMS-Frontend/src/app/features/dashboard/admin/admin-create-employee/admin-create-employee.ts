@@ -13,8 +13,8 @@ import { ADMIN_SIDEBAR, ROLES, DEPARTMENTS } from '../../../../core/models/user.
   styleUrl: './admin-create-employee.scss',
 })
 export class AdminCreateEmployeeComponent {
-  private adminService = inject(AdminService);
-  private fb = inject(FormBuilder);
+  private readonly adminService = inject(AdminService);
+  private readonly fb = inject(FormBuilder);
 
   sidebarItems = ADMIN_SIDEBAR;
   roles = ROLES;

@@ -19,10 +19,21 @@
   animation: slideUp 0.2s ease;
   overflow: hidden;
 
-  &--danger  { border-top: 4px solid #dc2626; }
-  &--warning { border-top: 4px solid #d97706; }
-  &--success { border-top: 4px solid #16a34a; }
-  &--info    { border-top: 4px solid #2563eb; }
+  &--danger {
+    border-top: 4px solid #dc2626;
+  }
+
+  &--warning {
+    border-top: 4px solid #d97706;
+  }
+
+  &--success {
+    border-top: 4px solid #16a34a;
+  }
+
+  &--info {
+    border-top: 4px solid #2563eb;
+  }
 }
 
 .modal-header {
@@ -41,10 +52,25 @@
   justify-content: center;
   font-size: 1.1rem;
 
-  &--danger  { background-color: #fef2f2; color: #dc2626; }
-  &--warning { background-color: #fffbeb; color: #d97706; }
-  &--success { background-color: #f0fdf4; color: #16a34a; }
-  &--info    { background-color: #eff6ff; color: #2563eb; }
+  &--danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+  }
+
+  &--warning {
+    background-color: #fffbeb;
+    color: #92400e;
+  }
+
+  &--success {
+    background-color: #f0fdf4;
+    color: #166534;
+  }
+
+  &--info {
+    background-color: #eff6ff;
+    color: #2563eb;
+  }
 }
 
 .modal-close {
@@ -107,21 +133,39 @@
 .btn-danger {
   background-color: #dc2626;
   color: #ffffff;
-  &:hover { background-color: #b91c1c; }
+
+  &:hover {
+    background-color: #b91c1c;
+  }
 }
 
 .btn-success {
-  background-color: #16a34a;
+  background-color: #15803d;
   color: #ffffff;
-  &:hover { background-color: #15803d; }
+
+  &:hover {
+    background-color: #166534;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

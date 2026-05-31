@@ -8,7 +8,7 @@ import { ApiResponse, PendingApproval } from '../models/api-response.model';
   providedIn: 'root'
 })
 export class AdminService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/admin`;
 
   getPendingApprovals(): Observable<ApiResponse<PendingApproval[]>> {

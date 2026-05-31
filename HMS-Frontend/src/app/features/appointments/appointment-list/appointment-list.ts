@@ -17,11 +17,11 @@ import { DEPARTMENTS } from '../../../core/models/user.model';
   styleUrl: './appointment-list.scss'
 })
 export class AppointmentListComponent implements OnInit {
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-  private confirmModal = inject(ConfirmModalService);
+  private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
+  private readonly confirmModal = inject(ConfirmModalService);
 
   @Input() showTodayOnly = false;
   @Input() doctorView = false;
