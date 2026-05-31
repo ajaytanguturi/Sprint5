@@ -5,19 +5,13 @@ const Employee = require('../models/employeeModel');
 const { generatePasswordResetToken } = require('../utils/generateToken');
 const { generateTemporaryPassword } = require('../utils/passwordGenerator');
 const { findEmployeeConflicts } = require('./employeeController');
-const {
-    sendApprovalEmail,
-    sendRejectionEmail,
-    sendTemporaryPasswordEmail,
-} = require('../utils/emailService');
+const {sendApprovalEmail,sendRejectionEmail,sendTemporaryPasswordEmail} = require('../utils/emailService');
 
-const SALT_ROUNDS = 12;
-const TEMP_PASSWORD_TTL_MS = 24 * 3_600_000; // 24 hours
+const saltRound = 12;
+const tempPasswordExpire = 24 * 3_600_000; // 1 day
 
-/**
- * GET /api/admin/pending-approvals
- * Returns all users with approvalStatus === 'PENDING'.
- */
+
+//Pending approvals
 const getPendingApprovals = async (req, res) => {
     try {
         const pending = await User.find({ approvalStatus: 'PENDING' })
@@ -36,15 +30,12 @@ const getPendingApprovals = async (req, res) => {
 
         return res.status(200).json({ success: true, message: 'Pending approvals retrieved', data });
     } catch (error) {
-        console.error('[getPendingApprovals]', error.message);
+        console.error(error.message);
         return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
     }
 };
 
-/**
- * PUT /api/admin/approve/:userId
- * Approves a pending employee registration and sends a confirmation email.
- */
+//Admin approving employee
 const approveEmployee = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.userId }).populate('employeeId', 'name email');
@@ -71,15 +62,12 @@ const approveEmployee = async (req, res) => {
             data: { userId: user.userId, email: user.email, approvalStatus: user.approvalStatus },
         });
     } catch (error) {
-        console.error('[approveEmployee]', error.message);
+        console.error(error.message);
         return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
     }
 };
 
-/**
- * PUT /api/admin/reject/:userId
- * Rejects a pending employee registration and sends a notification email.
- */
+// if admin rejects employee
 const rejectEmployee = async (req, res) => {
     try {
         const { reason } = req.body;
@@ -106,16 +94,12 @@ const rejectEmployee = async (req, res) => {
             data: { userId: user.userId, email: user.email, approvalStatus: user.approvalStatus },
         });
     } catch (error) {
-        console.error('[rejectEmployee]', error.message);
+        console.error( error.message);
         return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
     }
 };
 
-/**
- * POST /api/admin/create-employee
- * Admin creates an employee + user account with a temporary password.
- * Sends a password-reset link via email.
- */
+// admin create employee
 const createEmployeeWithTempPassword = async (req, res) => {
     try {
         const {
@@ -125,8 +109,6 @@ const createEmployeeWithTempPassword = async (req, res) => {
         } = req.body;
 
         const normalizedEmail = email.toLowerCase().trim();
-
-        // Run conflict checks against both Employee and User collections
         const [employeeConflicts, existingUser] = await Promise.all([
             findEmployeeConflicts({ email: normalizedEmail, phone, medicalRegistrationNo }),
             User.findOne({ email: normalizedEmail }),
@@ -162,7 +144,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
         }
 
         const tempPassword = generateTemporaryPassword();
-        const passwordHash = await bcrypt.hash(tempPassword, bcrypt.genSaltSync(SALT_ROUNDS));
+        const passwordHash = await bcrypt.hash(tempPassword, bcrypt.genSalt(saltRound));
 
         const user = await new User({
             email: normalizedEmail,
@@ -176,7 +158,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
 
         const resetToken = generatePasswordResetToken({ id: user._id, email: user.email });
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpires = Date.now() + TEMP_PASSWORD_TTL_MS;
+        user.resetPasswordExpires = Date.now() + tempPasswordExpire;
         await user.save();
 
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -196,7 +178,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
             data: { userId: user.userId, email: user.email, roles: user.roles, employeeCode },
         });
     } catch (error) {
-        console.error('[createEmployeeWithTempPassword]', error.message);
+        console.error(error.message);
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map((e) => e.message).join(', ');
             return res.status(400).json({ success: false, message: messages });
@@ -205,10 +187,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
     }
 };
 
-/**
- * GET /api/admin/users
- * Lists all registered users with their linked employee details.
- */
+// displays all users
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find()
@@ -228,15 +207,9 @@ const getAllUsers = async (req, res) => {
 
         return res.status(200).json({ success: true, message: 'All users retrieved successfully', data });
     } catch (error) {
-        console.error('[getAllUsers]', error.message);
+        console.error(error.message);
         return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
     }
 };
 
-module.exports = {
-    getPendingApprovals,
-    approveEmployee,
-    rejectEmployee,
-    createEmployeeWithTempPassword,
-    getAllUsers,
-};
+module.exports = {getPendingApprovals,approveEmployee,rejectEmployee,createEmployeeWithTempPassword,getAllUsers};
