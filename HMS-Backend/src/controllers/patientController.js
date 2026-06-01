@@ -1,8 +1,7 @@
 const Patient = require('../models/patientModel');
 const { buildOwnershipFilter } = require('../utils/ownershipFilter');
 
-// ── Shared ───────────────────────────────────────────────────────────────────
-
+//error display
 const handleError = (res, error, context) => {
     console.error(`[${context}]`, error.message);
     if (error.name === 'ValidationError') {
@@ -12,28 +11,18 @@ const handleError = (res, error, context) => {
     return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
 };
 
-// ── Controllers ──────────────────────────────────────────────────────────────
-
-/**
- * POST /api/patients
- * Access: RECEPTIONIST, NURSE, ADMIN, OWNER
- */
 exports.createPatient = async (req, res) => {
     try {
         const { name, phone, email, gender, dob, address, emergencyContact, medicalHistory, status } = req.body;
-
         const normalizedEmail = email.toLowerCase().trim();
-
         const emailTaken = await Patient.findOne({ email: normalizedEmail });
         if (emailTaken) {
             return res.status(409).json({ success: false, message: `Email "${email}" is already registered to a patient` });
         }
-
         const dobDate = new Date(dob);
         if (dobDate > new Date()) {
             return res.status(400).json({ success: false, message: 'Date of birth cannot be in the future' });
         }
-
         const patient = await new Patient({
             name,
             phone: phone.trim(),
@@ -46,7 +35,6 @@ exports.createPatient = async (req, res) => {
             status: status || 'ACTIVE',
             registeredBy: req.user.id,
         }).save();
-
         return res.status(201).json({
             success: true,
             message: 'Patient registered successfully',
@@ -66,21 +54,14 @@ exports.createPatient = async (req, res) => {
     }
 };
 
-/**
- * GET /api/patients
- * Access: RECEPTIONIST, NURSE, ADMIN, OWNER
- */
 exports.getAllPatients = async (req, res) => {
     try {
         const { page = 1, limit = 10, status, gender } = req.query;
-
         const filter = { ...buildOwnershipFilter(req.user, 'registeredBy') };
         if (status) filter.status = status;
         if (gender) filter.gender = gender;
-
         const pageNum = Math.max(Number.parseInt(page, 10), 1);
         const limitNum = Math.min(Number.parseInt(limit, 10), 100);
-
         const [patients, total] = await Promise.all([
             Patient.find(filter)
                 .select('-__v')
@@ -90,7 +71,6 @@ exports.getAllPatients = async (req, res) => {
                 .populate('registeredBy', 'email userId'),
             Patient.countDocuments(filter),
         ]);
-
         return res.status(200).json({
             success: true,
             message: 'Patients retrieved successfully',
@@ -102,21 +82,15 @@ exports.getAllPatients = async (req, res) => {
     }
 };
 
-/**
- * GET /api/patients/search?q=...
- * Access: RECEPTIONIST, NURSE, ADMIN, OWNER
- */
 exports.searchPatients = async (req, res) => {
     try {
         const { q } = req.query;
         if (!q || q.trim().length < 2) {
             return res.status(400).json({ success: false, message: 'Search query must be at least 2 characters' });
         }
-
         const term = q.trim();
         const pattern = { $regex: term, $options: 'i' };
         const ownerFilter = buildOwnershipFilter(req.user, 'registeredBy');
-
         const searchCriteria = { $or: [{ UHID: pattern }, { name: pattern }, { phone: pattern }, { email: pattern }] };
         const finalFilter = Object.keys(ownerFilter).length
             ? { $and: [ownerFilter, searchCriteria] }
@@ -125,7 +99,6 @@ exports.searchPatients = async (req, res) => {
         const patients = await Patient.find(finalFilter)
             .select('UHID name phone email gender dob status')
             .limit(20);
-
         return res.status(200).json({
             success: true,
             message: `Found ${patients.length} patient(s)`,
@@ -136,37 +109,25 @@ exports.searchPatients = async (req, res) => {
     }
 };
 
-/**
- * GET /api/patients/:id
- * Access: All authenticated users
- */
 exports.getPatientById = async (req, res) => {
     try {
         const filter = { _id: req.params.id, ...buildOwnershipFilter(req.user, 'registeredBy') };
         const patient = await Patient.findOne(filter).select('-__v').populate('registeredBy', 'email userId');
-
         if (!patient) {
             return res.status(404).json({ success: false, message: 'Patient not found' });
         }
-
         return res.status(200).json({ success: true, message: 'Patient retrieved successfully', data: patient });
     } catch (err) {
         return handleError(res, err, 'getPatientById');
     }
 };
 
-/**
- * PUT /api/patients/:id
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.updatePatient = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = { ...req.body };
-
         delete updates.UHID;
         delete updates.registeredBy;
-
         if (updates.email) {
             const conflict = await Patient.findOne({
                 email: updates.email.toLowerCase().trim(),
@@ -177,33 +138,24 @@ exports.updatePatient = async (req, res) => {
             }
             updates.email = updates.email.toLowerCase().trim();
         }
-
         const filter = { _id: id, ...buildOwnershipFilter(req.user, 'registeredBy') };
         const patient = await Patient.findOneAndUpdate(filter, updates, { new: true, runValidators: true });
-
         if (!patient) {
             return res.status(404).json({ success: false, message: 'Patient not found' });
         }
-
         return res.status(200).json({ success: true, message: 'Patient updated successfully', data: patient });
     } catch (err) {
         return handleError(res, err, 'updatePatient');
     }
 };
 
-/**
- * DELETE /api/patients/:id
- * Access: ADMIN, OWNER
- */
 exports.deletePatient = async (req, res) => {
     try {
         const filter = { _id: req.params.id, ...buildOwnershipFilter(req.user, 'registeredBy') };
         const patient = await Patient.findOneAndDelete(filter);
-
         if (!patient) {
             return res.status(404).json({ success: false, message: 'Patient not found' });
         }
-
         return res.status(200).json({ success: true, message: 'Patient removed successfully' });
     } catch (err) {
         return handleError(res, err, 'deletePatient');

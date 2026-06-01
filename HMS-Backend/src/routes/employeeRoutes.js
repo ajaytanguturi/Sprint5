@@ -1,19 +1,10 @@
 const express = require('express');
 const { body } = require('express-validator');
-const {
-    createEmployee,
-    getEmployees,
-    getEmployeeById,
-    updateEmployee,
-    toggleEmployeeStatus,
-} = require('../controllers/employeeController');
+const { createEmployee, getEmployees, getEmployeeById, updateEmployee, toggleEmployeeStatus } = require('../controllers/employeeController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate } = require('../middleware/validate');
 
 const router = express.Router();
-
-// ── Validation rule sets ─────────────────────────────────────────────────────
-
 const VALID_DEPARTMENTS = ['OPD', 'IPD', 'Lab', 'Pharmacy', 'Admin'];
 
 const createRules = [
@@ -42,8 +33,6 @@ const updateRules = [
         .isFloat({ min: 0 })
         .withMessage('Consultation fee must be a non-negative number'),
 ];
-
-// ── Routes (all require ADMIN or OWNER) ─────────────────────────────────────
 
 router.use(protect, authorize('ADMIN', 'OWNER'));
 

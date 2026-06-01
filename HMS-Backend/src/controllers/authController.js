@@ -2,27 +2,16 @@ const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
 const User = require('../models/userModel');
 const Employee = require('../models/employeeModel');
-const {
-    generateAccessToken,
-    generateRefreshToken,
-    generatePasswordResetToken,
-} = require('../utils/generateToken');
-const {
-    sendRegistrationPendingEmail,
-    sendAdminNotificationEmail,
-    sendPasswordResetEmail,
-} = require('../utils/emailService');
+const { generateAccessToken, generateRefreshToken, generatePasswordResetToken, } = require('../utils/generateToken');
+const { sendRegistrationPendingEmail, sendAdminNotificationEmail, sendPasswordResetEmail } = require('../utils/emailService');
 
-// ── Constants ────────────────────────────────────────────────────────────────
-
+// constants
 const VALID_ROLES = ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST'];
 const ADMIN_ROLES = new Set(['OWNER', 'ADMIN']);
 const SALT_ROUNDS = 12;
 
-// ── Shared helpers ───────────────────────────────────────────────────────────
-
+// helper functions
 const hashPassword = (plain) => bcrypt.hash(plain, bcrypt.genSaltSync(SALT_ROUNDS));
-
 const buildTokenPayload = (user) => ({
     id: user._id,
     userId: user.userId,
@@ -44,10 +33,8 @@ const validateRoles = (roles) => {
 };
 
 const isAdminLevel = (roles) => roles.some((r) => ADMIN_ROLES.has(r));
-
 const handleControllerError = (res, error, context) => {
     console.error(`[${context}]`, error.message);
-
     if (error.statusCode) {
         return res.status(error.statusCode).json({ success: false, message: error.message });
     }
@@ -58,24 +45,15 @@ const handleControllerError = (res, error, context) => {
     return res.status(500).json({ success: false, message: 'An unexpected error occurred' });
 };
 
-// ── Controllers ──────────────────────────────────────────────────────────────
-
-/**
- * POST /api/auth/register
- * Admin creates a user account for an existing employee.
- */
 const register = async (req, res) => {
     try {
         const { email, password, roles, employeeId, status } = req.body;
         const normalizedEmail = email.toLowerCase().trim();
-
         const existing = await User.findOne({ email: normalizedEmail });
         if (existing) {
             return res.status(409).json({ success: false, message: `Email "${email}" is already registered` });
         }
-
         const rolesArr = validateRoles(roles);
-
         let resolvedEmployeeId = null;
         if (!isAdminLevel(rolesArr)) {
             if (!employeeId) {
@@ -94,9 +72,7 @@ const register = async (req, res) => {
             }
             resolvedEmployeeId = emp._id;
         }
-
         const passwordHash = await hashPassword(password);
-
         const saved = await new User({
             email: normalizedEmail,
             passwordHash,
@@ -105,9 +81,7 @@ const register = async (req, res) => {
             status: status || 'ACTIVE',
             approvalStatus: 'APPROVED',
         }).save();
-
         const populated = await User.findById(saved._id).populate('employeeId', 'employeeCode name designation department email phone');
-
         return res.status(201).json({
             success: true,
             message: 'User registered successfully',
@@ -124,10 +98,6 @@ const register = async (req, res) => {
     }
 };
 
-/**
- * POST /api/auth/self-register
- * An employee self-registers; account is created in PENDING state.
- */
 const selfRegister = async (req, res) => {
     try {
         const {
@@ -136,15 +106,12 @@ const selfRegister = async (req, res) => {
             consultationFee, availabilitySlots, joiningDate,
             password, roles,
         } = req.body;
-
         const normalizedEmail = email.toLowerCase().trim();
-
         const [empByEmail, userByEmail, empByPhone] = await Promise.all([
             Employee.findOne({ email: normalizedEmail }),
             User.findOne({ email: normalizedEmail }),
             Employee.findOne({ phone }),
         ]);
-
         if (empByEmail) {
             return res.status(409).json({ success: false, message: `An employee with email "${email}" already exists` });
         }
@@ -154,25 +121,21 @@ const selfRegister = async (req, res) => {
         if (empByPhone) {
             return res.status(409).json({ success: false, message: `An employee with phone "${phone}" already exists` });
         }
-
         const rolesArr = validateRoles(roles);
         if (isAdminLevel(rolesArr)) {
             return res.status(403).json({ success: false, message: 'Self-registration is not allowed for OWNER or ADMIN roles' });
         }
-
         if (medicalRegistrationNo) {
             const regNoConflict = await Employee.findOne({ medicalRegistrationNo });
             if (regNoConflict) {
                 return res.status(409).json({ success: false, message: `Medical registration number "${medicalRegistrationNo}" is already in use` });
             }
         }
-
         const employee = await new Employee({
             name,
             phone,
             email: normalizedEmail,
             department,
-
             designation,
             medicalRegistrationNo: medicalRegistrationNo?.trim() || undefined,
             specialization,
@@ -182,9 +145,7 @@ const selfRegister = async (req, res) => {
             joiningDate: joiningDate || Date.now(),
             status: 'ACTIVE',
         }).save();
-
         const passwordHash = await hashPassword(password);
-
         const user = await new User({
             email: normalizedEmail,
             passwordHash,
@@ -193,14 +154,11 @@ const selfRegister = async (req, res) => {
             status: 'ACTIVE',
             approvalStatus: 'PENDING',
         }).save();
-
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@hospital.com';
-
         await Promise.allSettled([
             sendRegistrationPendingEmail(employee.email, employee.name),
             sendAdminNotificationEmail(adminEmail, employee.name, employee.email),
         ]);
-
         return res.status(201).json({
             success: true,
             message: 'Registration submitted successfully. Your account is awaiting admin approval.',
@@ -217,13 +175,9 @@ const selfRegister = async (req, res) => {
     }
 };
 
-/**
- * POST /api/auth/login
- */
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
         const user = await User.findOne({ email: email.toLowerCase().trim() })
             .select('+passwordHash +refreshToken')
             .populate('employeeId', 'employeeCode name designation department email phone specialization');
@@ -231,7 +185,6 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
-
         if (user.status === 'INACTIVE') {
             return res.status(403).json({ success: false, message: 'Your account is inactive. Contact administrator' });
         }
@@ -241,12 +194,10 @@ const login = async (req, res) => {
         if (user.approvalStatus === 'REJECTED') {
             return res.status(403).json({ success: false, message: 'Your account registration was rejected. Contact administrator' });
         }
-
         const passwordMatch = await bcrypt.compare(password, user.passwordHash);
         if (!passwordMatch) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
-
         if (user.isTemporaryPassword) {
             return res.status(403).json({
                 success: false,
@@ -254,15 +205,12 @@ const login = async (req, res) => {
                 requirePasswordReset: true,
             });
         }
-
         const payload = buildTokenPayload(user);
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken({ id: user._id });
-
         user.refreshToken = refreshToken;
         user.lastLoginAt = new Date();
         await user.save();
-
         return res.status(200).json({
             success: true,
             message: 'Login successful',
@@ -280,20 +228,16 @@ const login = async (req, res) => {
         return handleControllerError(res, err, 'login');
     }
 };
-/**
- * GET /api/auth/me
- */
+
 const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate(
             'employeeId',
             'employeeCode name designation department email phone specialization qualification consultationFee'
         );
-
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
         return res.status(200).json({
             success: true,
             message: 'Profile retrieved successfully',
@@ -313,38 +257,26 @@ const getMe = async (req, res) => {
     }
 };
 
-/**
- * POST /api/auth/forgot-password
- */
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email: email.toLowerCase().trim() }).populate('employeeId', 'name');
-
-        // Always respond the same way to prevent user enumeration
         if (!user) {
             return res.status(200).json({ success: true, message: 'If this email is registered, a reset link has been sent.' });
         }
-
         const resetToken = generatePasswordResetToken({ id: user._id, email: user.email });
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         user.resetPasswordExpires = Date.now() + 3_600_000; // 1 hour
         await user.save();
-
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
         const displayName = user.employeeId?.name || user.email;
-
         await sendPasswordResetEmail(user.email, displayName, resetUrl);
-
         return res.status(200).json({ success: true, message: 'Password reset link sent to your email' });
     } catch (err) {
         return handleControllerError(res, err, 'forgotPassword');
     }
 };
 
-/**
- * POST /api/auth/reset-password
- */
 const resetPassword = async (req, res) => {
     try {
         console.log(req.body);
@@ -353,44 +285,34 @@ const resetPassword = async (req, res) => {
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() },
         }).select('+resetPasswordToken +resetPasswordExpires');
-
         if (!user) {
             return res.status(400).json({ success: false, message: 'Reset token is invalid or has expired' });
         }
-
         user.passwordHash = await hashPassword(newPassword);
         user.resetPasswordToken = null;
         user.resetPasswordExpires = null;
         user.isTemporaryPassword = false;
         await user.save();
-
         return res.status(200).json({ success: true, message: 'Password reset successful. You may now log in.' });
     } catch (err) {
         return handleControllerError(res, err, 'resetPassword');
     }
 };
 
-/**
- * PUT /api/auth/change-password
- */
 const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-
         const user = await User.findById(req.user.id).select('+passwordHash');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
         const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Current password is incorrect' });
         }
-
         user.passwordHash = await hashPassword(newPassword);
         user.isTemporaryPassword = false;
         await user.save();
-
         return res.status(200).json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
         return handleControllerError(res, err, 'changePassword');

@@ -1,24 +1,24 @@
 <app-dashboard-layout [menuItems]="sidebarItems" title="HMS" subtitle="Reception" pageTitle="Dashboard">
   <!-- Stats -->
   <div class="stats-grid">
-    <div class="stat-card stat-accent" (click)="navigateTo('/receptionist/appointments/today')">
-      <div class="stat-content">
-        <p class="stat-value">{{ todayAppointments.length }}</p>
-        <p class="stat-label">Today's Appointments</p>
-      </div>
-    </div>
-    <div class="stat-card stat-primary" (click)="navigateTo('/receptionist/appointments/today')">
-      <div class="stat-content">
-        <p class="stat-value">{{ totalBookedToday }}</p>
-        <p class="stat-label">Pending Today</p>
-      </div>
-    </div>
-    <div class="stat-card stat-info" (click)="navigateTo('/receptionist/patients')">
-      <div class="stat-content">
-        <p class="stat-value">{{ totalPatients }}</p>
-        <p class="stat-label">Total Patients</p>
-      </div>
-    </div>
+    <button type="button" class="stat-card stat-accent" (click)="navigateTo('/receptionist/appointments/today')">
+      <span class="stat-content">
+        <span class="stat-value">{{ todayAppointments.length }}</span>
+        <span class="stat-label">Today's Appointments</span>
+      </span>
+    </button>
+    <button type="button" class="stat-card stat-primary" (click)="navigateTo('/receptionist/appointments/today')">
+      <span class="stat-content">
+        <span class="stat-value">{{ totalBookedToday }}</span>
+        <span class="stat-label">Pending Today</span>
+      </span>
+    </button>
+    <button type="button" class="stat-card stat-info" (click)="navigateTo('/receptionist/patients')">
+      <span class="stat-content">
+        <span class="stat-value">{{ totalPatients }}</span>
+        <span class="stat-label">Total Patients</span>
+      </span>
+    </button>
   </div>
 
   <!-- Quick Actions -->
@@ -26,13 +26,13 @@
     <h2>Quick Actions</h2>
   </div>
   <div class="actions-grid">
-    <button class="action-card" (click)="navigateTo('/receptionist/book-appointment')">
+    <button type="button" class="action-card" (click)="navigateTo('/receptionist/book-appointment')">
       <span class="action-label">Book Appointment</span>
     </button>
-    <button class="action-card" (click)="navigateTo('/receptionist/patients/create')">
+    <button type="button" class="action-card" (click)="navigateTo('/receptionist/patients/create')">
       <span class="action-label">Register Patient</span>
     </button>
-    <button class="action-card" (click)="navigateTo('/receptionist/patients/search')">
+    <button type="button" class="action-card" (click)="navigateTo('/receptionist/patients/search')">
       <span class="action-label">Search Patient</span>
     </button>
   </div>
@@ -41,7 +41,8 @@
   @if (todayAppointments.length > 0) {
   <div class="section-header">
     <h2>Today's Appointments</h2>
-    <button (click)="navigateTo('/receptionist/appointments/today')" class="btn btn-secondary btn-sm">View All</button>
+    <button type="button" (click)="navigateTo('/receptionist/appointments/today')" class="btn btn-secondary btn-sm">View
+      All</button>
   </div>
   <div class="card">
     <div class="table-container">

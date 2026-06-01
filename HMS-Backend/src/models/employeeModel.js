@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Counter = require('./counterModel'); // import counter model
+const Counter = require('./counterModel');
 
 const employeeSchema = new mongoose.Schema({
     employeeCode: {
@@ -53,7 +53,6 @@ const employeeSchema = new mongoose.Schema({
     },
     medicalRegistrationNo: {
         type: String,
-        // required: [true, 'Medical Registration Number is required'],
         unique: true,
         trim: true,
         sparse: true,
@@ -68,7 +67,6 @@ const employeeSchema = new mongoose.Schema({
         {
             type: String,
             trim: true,
-            // required: true,
         },
 
     ],
@@ -84,7 +82,6 @@ const employeeSchema = new mongoose.Schema({
         ],
         trim: true,
     }],
-
 },
     { timestamps: true },
 );
@@ -95,7 +92,6 @@ employeeSchema.pre('save', async function () {
             const seq = await Counter.getNextSequence('employeeCode');
             this.employeeCode = `EMP-${String(seq).padStart(4, '0')}`;
         }
-
     } catch (error) {
         console.log(error.message);
     }

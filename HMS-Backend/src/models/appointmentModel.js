@@ -64,8 +64,6 @@ const appointmentSchema = new mongoose.Schema({
         },
         default: 'BOOKED',
     },
-
-    // Doctor's consultation details (filled after appointment)
     doctorNotes: {
         type: String,
         default: ''
@@ -78,8 +76,6 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-
-    // Metadata
     createdByEmployeeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -94,8 +90,6 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-
-    // Future integrations (prepared but not implemented)
     billId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Bill',
@@ -110,7 +104,6 @@ const appointmentSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Auto-generate appointmentId before saving
 appointmentSchema.pre('save', async function () {
     try {
         if (!this.appointmentId) {
@@ -121,8 +114,6 @@ appointmentSchema.pre('save', async function () {
         console.log(error.message);
     }
 });
-
-// Index for faster queries
 appointmentSchema.index({ date: 1, doctorEmployeeId: 1 });
 appointmentSchema.index({ patientId: 1 });
 appointmentSchema.index({ status: 1 });

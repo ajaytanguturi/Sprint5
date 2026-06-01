@@ -2,21 +2,20 @@ const mongoose = require('mongoose');
 
 const counterSchema = new mongoose.Schema({
     _id: {
-        type: String,   // name of the counter e.g: "employeeCode", "uhid"
+        type: String,
         required: true,
     },
     seq: {
         type: Number,
-        default: 0,     // starts from 0, first record will be 1
+        default: 0,
     },
 });
 
-// Static method to get next sequence number
 counterSchema.statics.getNextSequence = async function (name) {
     const counter = await this.findByIdAndUpdate(
-        name,                        // find counter by name
-        { $inc: { seq: 1 } },        // increment seq by 1
-        { returnDocument: 'after', upsert: true }  // create if not exists, return updated doc
+        name,
+        { $inc: { seq: 1 } },
+        { returnDocument: 'after', upsert: true }
     );
     return counter.seq;
 };

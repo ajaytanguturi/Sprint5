@@ -1,7 +1,5 @@
 const Employee = require('../models/employeeModel');
 
-// ── Shared uniqueness checker ────────────────────────────────────────────────
-
 /**
  * Checks whether the given employee fields are already taken by another record.
  * Pass `excludeId` when updating so the employee being edited is ignored.
@@ -30,13 +28,7 @@ const findEmployeeConflicts = async ({ email, phone, medicalRegistrationNo }, ex
     return messages;
 };
 
-// ── Controllers ──────────────────────────────────────────────────────────────
 
-/**
- * POST /api/employees
- * Creates a standalone employee profile (no user account).
- * Access: ADMIN, OWNER
- */
 exports.createEmployee = async (req, res) => {
     try {
         const {
@@ -80,12 +72,6 @@ exports.createEmployee = async (req, res) => {
     }
 };
 
-/**
- * GET /api/employees
- * Lists employees with optional search, status, and department filters.
- * Supports pagination via `page` and `limit` query params.
- * Access: ADMIN, OWNER
- */
 exports.getEmployees = async (req, res) => {
     try {
         const { page = 1, limit = 10, status, department, search } = req.query;
@@ -128,10 +114,6 @@ exports.getEmployees = async (req, res) => {
     }
 };
 
-/**
- * GET /api/employees/:id
- * Access: ADMIN, OWNER
- */
 exports.getEmployeeById = async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id).select('-__v');
@@ -147,17 +129,11 @@ exports.getEmployeeById = async (req, res) => {
     }
 };
 
-/**
- * PUT /api/employees/:id
- * Partial update; runs uniqueness checks on mutable fields.
- * Access: ADMIN, OWNER
- */
 exports.updateEmployee = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = { ...req.body };
 
-        // Prevent overwriting system-generated identifiers
         delete updates.employeeCode;
         delete updates._id;
 
@@ -199,11 +175,6 @@ exports.updateEmployee = async (req, res) => {
     }
 };
 
-/**
- * PATCH /api/employees/:id/status
- * Toggles ACTIVE ↔ INACTIVE.
- * Access: ADMIN, OWNER
- */
 exports.toggleEmployeeStatus = async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
@@ -227,5 +198,4 @@ exports.toggleEmployeeStatus = async (req, res) => {
     }
 };
 
-// Export the shared helper so adminController can reuse it without duplication
 exports.findEmployeeConflicts = findEmployeeConflicts;

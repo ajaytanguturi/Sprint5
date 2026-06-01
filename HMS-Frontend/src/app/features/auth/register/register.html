@@ -33,7 +33,7 @@
             <label for="phone" class="form-label">Phone *</label>
             <input type="tel" id="phone" formControlName="phone" class="form-input" placeholder="+1234567890" />
             @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
-            <p class="form-error">Phone is required</p>
+            <p class="form-error">Phone Number is required</p>
             }
           </div>
 
@@ -84,7 +84,7 @@
           </div>
           }
 
-          <!-- ── ★ DOCTOR-SPECIFIC FIELDS ★ ──────────────────── -->
+          <!--Related to Doctor only -->
           @if (selectedRole === 'DOCTOR') {
           <!-- Specialization -->
           <div class="form-group">
@@ -101,7 +101,7 @@
           </div>
           }
 
-          <!-- ── ★ QUALIFICATIONS (chip-based, all roles) ★ ───── -->
+          <!--Qualifications -->
           <div class="form-group form-group-full">
             <label for="qualifications" class="form-label">Qualifications</label>
             <div class="chip-list">
@@ -120,7 +120,7 @@
             </div>
           </div>
 
-          <!-- ── ★ AVAILABILITY SLOTS (chip-based, DOCTOR only) ★ ─ -->
+          <!-- Doctor Slots availability-->
           @if (selectedRole === 'DOCTOR') {
           <div class="form-group form-group-full">
             <label for="availabilitySlots" class="form-label">Availability Slots</label>
@@ -182,7 +182,6 @@
           </div>
         </div>
 
-        <!-- Error/Success Messages -->
         @if (errorMessage) {
         <div class="alert alert-error">
           {{ errorMessage }}

@@ -8,8 +8,7 @@ const {
     sendAppointmentCancellationEmail,
 } = require('../utils/appointmentEmailService');
 
-// ── Constants ────────────────────────────────────────────────────────────────
-
+// Constants
 const ADMIN_ROLES = new Set(['ADMIN', 'OWNER']);
 const VALID_STATUSES = ['BOOKED', 'CANCELLED', 'COMPLETED'];
 const SLOT_DURATIONS = [15, 30];
@@ -18,7 +17,7 @@ const PATIENT_FIELDS = 'UHID name phone email gender age';
 const DOCTOR_FIELDS = 'employeeCode name specialization department consultationFee';
 const CREATOR_FIELDS = 'email userId';
 
-// ── Shared helpers ───────────────────────────────────────────────────────────
+// helper methods
 
 const isAdmin = (user) => user.roles.some((r) => ADMIN_ROLES.has(r));
 
@@ -40,12 +39,6 @@ const buildDateRange = (dateStr) => {
     return { $gte: start, $lt: end };
 };
 
-// ── Controllers ──────────────────────────────────────────────────────────────
-
-/**
- * POST /api/appointments
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.createAppointment = async (req, res) => {
     try {
         const { patientId, doctorEmployeeId, date, timeSlot, department, appointmentType, reasonForVisit, consultationFee } = req.body;
@@ -137,10 +130,6 @@ exports.createAppointment = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.getAllAppointments = async (req, res) => {
     try {
         const { page = 1, limit = 10, status, date, doctorId, patientId, department } = req.query;
@@ -177,10 +166,6 @@ exports.getAllAppointments = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/my
- * Access: DOCTOR
- */
 exports.getMyAppointments = async (req, res) => {
     try {
         const { page = 1, limit = 10, status, date } = req.query;
@@ -219,10 +204,7 @@ exports.getMyAppointments = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/doctor/:doctorId
- * Access: ADMIN, NURSE, OWNER
- */
+
 exports.getDoctorAppointments = async (req, res) => {
     try {
         const { doctorId } = req.params;
@@ -260,10 +242,6 @@ exports.getDoctorAppointments = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/patient/:patientId
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.getPatientAppointments = async (req, res) => {
     try {
         const { patientId } = req.params;
@@ -288,10 +266,6 @@ exports.getPatientAppointments = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/today
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.getTodayAppointments = async (req, res) => {
     try {
         const today = new Date();
@@ -316,10 +290,6 @@ exports.getTodayAppointments = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/:id
- * Access: All authenticated users
- */
 exports.getAppointmentById = async (req, res) => {
     try {
         let filter = { _id: req.params.id };
@@ -356,10 +326,6 @@ exports.getAppointmentById = async (req, res) => {
     }
 };
 
-/**
- * PUT /api/appointments/:id/status
- * Access: RECEPTIONIST, DOCTOR, ADMIN, OWNER
- */
 exports.updateAppointmentStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -391,14 +357,9 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 };
 
-/**
- * PUT /api/appointments/:id/notes
- * Access: DOCTOR (own), ADMIN, OWNER
- */
 exports.addDoctorNotes = async (req, res) => {
     try {
         const { doctorNotes, diagnosis, prescription } = req.body;
-        console.log('PUT /api/appointments/:id/notes id=', req.params.id);
         const appointment = await Appointment.findById(req.params.id);
         if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
 
@@ -423,19 +384,12 @@ exports.addDoctorNotes = async (req, res) => {
     }
 };
 
-/**
- * PUT /api/appointments/:id/cancel
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.cancelAppointment = async (req, res) => {
     try {
         const { cancellationReason } = req.body;
-        console.log('Appointment ID from URL:', req.params.id);
         const appointment = await Appointment.findById(req.params.id)
             .populate('patientId', 'UHID name email')
             .populate('doctorEmployeeId', 'name');
-        console.log('Appointment found:', appointment);
-
 
         if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
         if (appointment.status === 'CANCELLED') return res.status(400).json({ success: false, message: 'Appointment is already cancelled' });
@@ -462,10 +416,6 @@ exports.cancelAppointment = async (req, res) => {
     }
 };
 
-/**
- * DELETE /api/appointments/:id
- * Access: ADMIN, OWNER
- */
 exports.deleteAppointment = async (req, res) => {
     try {
         const appointment = await Appointment.findByIdAndDelete(req.params.id);
@@ -477,10 +427,6 @@ exports.deleteAppointment = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/doctors/available
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.getAvailableDoctors = async (req, res) => {
     try {
         const { specialization, department } = req.query;
@@ -513,10 +459,6 @@ exports.getAvailableDoctors = async (req, res) => {
     }
 };
 
-/**
- * GET /api/appointments/doctors/:doctorId/slots
- * Access: RECEPTIONIST, ADMIN, OWNER
- */
 exports.getAvailableSlots = async (req, res) => {
     try {
         const { doctorId } = req.params;

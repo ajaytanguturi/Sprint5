@@ -15,7 +15,6 @@ const patientSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: [true, 'Phone number is required'],
-        // unique: true,  ← REMOVED to allow family members
         trim: true,
     },
     email: {
@@ -68,7 +67,6 @@ const patientSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Auto-generate UHID before saving
 patientSchema.pre('save', async function () {
     try {
         if (!this.UHID) {
@@ -80,7 +78,7 @@ patientSchema.pre('save', async function () {
     }
 });
 
-// Virtual to calculate age from DOB
+// to calculate the age from date of birth
 patientSchema.virtual('age').get(function () {
     if (!this.dob) return null;
     const today = new Date();
@@ -92,8 +90,6 @@ patientSchema.virtual('age').get(function () {
     }
     return age;
 });
-
-// Ensure virtuals are included in JSON
 patientSchema.set('toJSON', { virtuals: true });
 patientSchema.set('toObject', { virtuals: true });
 

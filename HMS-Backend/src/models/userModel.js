@@ -87,7 +87,6 @@ userSchema.pre('save', function () {
     const isAdminLevel = this.roles.some(
         (r) => r === 'OWNER' || r === 'ADMIN'
     );
-
     if (!isAdminLevel && !this.employeeId) {
         throw new Error(
             `employeeId is required for roles: ${this.roles.join(', ')}`

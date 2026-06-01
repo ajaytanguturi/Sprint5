@@ -1,22 +1,12 @@
 const express = require('express');
 const { body } = require('express-validator');
-const {
-    createPatient,
-    getAllPatients,
-    getPatientById,
-    updatePatient,
-    deletePatient,
-    searchPatients,
-} = require('../controllers/patientController');
+const { createPatient, getAllPatients, getPatientById, updatePatient, deletePatient, searchPatients } = require('../controllers/patientController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate } = require('../middleware/validate');
 
 const router = express.Router();
 
-// ── Validation rule sets ─────────────────────────────────────────────────────
-
 const VALID_GENDERS = ['Male', 'Female', 'Other'];
-
 const createRules = [
     body('name').trim().notEmpty().withMessage('Patient name is required'),
     body('phone').matches(/^\d{10}$/).withMessage('Phone must be a 10-digit number'),
@@ -47,8 +37,6 @@ const updateRules = [
         .isISO8601()
         .withMessage('Date of birth must be a valid date (YYYY-MM-DD)'),
 ];
-
-// ── Routes ───────────────────────────────────────────────────────────────────
 
 router.use(protect);
 

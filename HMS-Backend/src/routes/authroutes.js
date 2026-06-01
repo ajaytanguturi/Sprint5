@@ -1,20 +1,10 @@
 const express = require('express');
 const { body } = require('express-validator');
-const {
-    register,
-    selfRegister,
-    login,
-    getMe,
-    forgotPassword,
-    resetPassword,
-    changePassword,
-} = require('../controllers/authController');
+const { register, selfRegister, login, getMe, forgotPassword, resetPassword, changePassword } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { validate } = require('../middleware/validate');
 
 const router = express.Router();
-
-// ── Validation rule sets ─────────────────────────────────────────────────────
 
 const registerRules = [
     body('email').isEmail().withMessage('A valid email is required').normalizeEmail(),
@@ -59,16 +49,12 @@ const changePasswordRules = [
         }),
 ];
 
-// ── Routes ───────────────────────────────────────────────────────────────────
-
-// Public
 router.post('/register', registerRules, validate, register);
 router.post('/self-register', selfRegisterRules, validate, selfRegister);
 router.post('/login', loginRules, validate, login);
 router.post('/forgot-password', forgotPasswordRules, validate, forgotPassword);
 router.post('/reset-password', resetPasswordRules, validate, resetPassword);
 
-// Protected
 router.get('/me', protect, getMe);
 router.put('/change-password', protect, changePasswordRules, validate, changePassword);
 

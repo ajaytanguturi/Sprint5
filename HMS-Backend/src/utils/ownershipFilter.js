@@ -1,15 +1,3 @@
-/**
- * OWNERSHIP FILTER UTILITY
- * 
- * Rules:
- *   ADMIN / OWNER  → empty filter (sees everything)
- *   Everyone else  → { [ownershipField]: user.id }
- *
- * Usage:
- *   const { buildOwnershipFilter } = require('../utils/ownershipFilter');
- *   const filter = { ...buildOwnershipFilter(req.user, 'registeredBy'), status: 'ACTIVE' };
- */
-
 const ADMIN_ROLES = new Set(['ADMIN', 'OWNER']);
 
 const buildOwnershipFilter = (user, ownershipField) => {

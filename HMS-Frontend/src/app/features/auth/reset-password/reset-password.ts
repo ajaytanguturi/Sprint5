@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -38,9 +38,9 @@ export class ResetPasswordComponent implements OnInit {
     }
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('newPassword');
-    const confirmPassword = form.get('confirmPassword');
+  passwordMatchValidator(control: AbstractControl) {
+    const password = control.get('newPassword');
+    const confirmPassword = control.get('confirmPassword');
 
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };

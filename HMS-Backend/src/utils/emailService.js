@@ -1,8 +1,6 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const Brevo = require('sib-api-v3-sdk');
-
-// ── Brevo client bootstrap ──────────────────────────────────────────────────
 const brevoClient = Brevo.ApiClient.instance;
 brevoClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 const transactionalApi = new Brevo.TransactionalEmailsApi();
@@ -11,8 +9,6 @@ const SENDER = {
   email: process.env.BREVO_SENDER_EMAIL || 'noreply@vanguardhms.com',
   name: 'Vanguard HMS',
 };
-
-// ── Private dispatcher (single source of Brevo boilerplate) ─────────────────
 const dispatch = async (recipientEmail, recipientName, subject, htmlContent) => {
   const payload = {
     sender: SENDER,
@@ -24,8 +20,6 @@ const dispatch = async (recipientEmail, recipientName, subject, htmlContent) => 
   console.info(`[Mail] Sent "${subject}" → ${recipientEmail}`);
   return result;
 };
-
-// ── Auth / Account emails ────────────────────────────────────────────────────
 
 const sendRegistrationPendingEmail = (email, name) =>
   dispatch(email, name, 'Registration Received – Pending Approval', `
@@ -108,9 +102,8 @@ const sendPasswordResetEmail = (email, name, resetUrl) =>
           </a>
           <p style="color:#6b7280;font-size:13px">This link expires in 1 hour. Ignore this email if you did not request a reset.</p>
           <p>Best regards,<br>Vanguard Admin Team</p>
-        </div>`);
-
-// ── Appointment emails ───────────────────────────────────────────────────────
+        </div>`
+  );
 
 const formatDate = (date) =>
   new Date(date).toLocaleDateString('en-IN', {
@@ -176,13 +169,6 @@ const sendAppointmentReminderEmail = ({
         </div>`);
 
 module.exports = {
-  sendRegistrationPendingEmail,
-  sendAdminNotificationEmail,
-  sendApprovalEmail,
-  sendRejectionEmail,
-  sendTemporaryPasswordEmail,
-  sendPasswordResetEmail,
-  sendAppointmentConfirmationEmail,
-  sendAppointmentCancellationEmail,
-  sendAppointmentReminderEmail,
+  sendRegistrationPendingEmail, sendAdminNotificationEmail, sendApprovalEmail, sendRejectionEmail, sendTemporaryPasswordEmail,
+  sendPasswordResetEmail, sendAppointmentConfirmationEmail, sendAppointmentCancellationEmail, sendAppointmentReminderEmail,
 };

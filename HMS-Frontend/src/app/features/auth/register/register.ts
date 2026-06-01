@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, AbstractControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ROLES, Role, DEPARTMENTS } from '../../../core/models/user.model';
@@ -44,7 +44,7 @@ export class RegisterComponent {
   ];
 
   constructor() {
-    
+
     this.registerForm = this.fb.group(
       {
         name: ['', Validators.required],
@@ -63,9 +63,9 @@ export class RegisterComponent {
     );
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password');
-    const confirmPassword = form.get('confirmPassword');
+  passwordMatchValidator(control: AbstractControl) {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
 
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };
@@ -78,8 +78,6 @@ export class RegisterComponent {
     this.selectedRole = role;
     this.showMedicalFields = ['DOCTOR', 'NURSE', 'LAB_TECH', 'PHARMACIST'].includes(role);
   }
-
-  // ── ★ Qualification chips ★ ───────────────────────────────────
   addQualification(): void {
     const trimmed = this.newQualification.trim();
     if (trimmed && !this.qualificationChips.includes(trimmed)) {
@@ -91,8 +89,6 @@ export class RegisterComponent {
   removeQualification(index: number): void {
     this.qualificationChips = this.qualificationChips.filter((_, i) => i !== index);
   }
-
-  // ── ★ Availability slot chips ★ ───────────────────────────────
   addAvailabilitySlot(): void {
     const trimmed = this.newAvailabilitySlot.trim();
     const regex = /^\d{2}:\d{2}-\d{2}:\d{2}$/;

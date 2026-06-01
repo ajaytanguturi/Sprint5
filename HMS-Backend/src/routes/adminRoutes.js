@@ -1,19 +1,10 @@
 const express = require('express');
 const { body } = require('express-validator');
-const {
-    getPendingApprovals,
-    approveEmployee,
-    rejectEmployee,
-    createEmployeeWithTempPassword,
-    getAllUsers,
-} = require('../controllers/adminController');
+const { getPendingApprovals, approveEmployee, rejectEmployee, createEmployeeWithTempPassword, getAllUsers } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate } = require('../middleware/validate');
 
 const router = express.Router();
-
-// ── Validation rule sets ─────────────────────────────────────────────────────
-
 const VALID_DEPARTMENTS = ['OPD', 'IPD', 'Lab', 'Pharmacy', 'Admin'];
 
 const createEmployeeRules = [
@@ -34,8 +25,6 @@ const createEmployeeRules = [
 const rejectRules = [
     body('reason').optional().trim(),
 ];
-
-// ── Routes (all require ADMIN or OWNER) ─────────────────────────────────────
 
 router.use(protect, authorize('ADMIN', 'OWNER'));
 

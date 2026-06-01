@@ -33,14 +33,11 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
-
+    const { email, password } = this.loginForm.value; //JSON  response
     this.authService.login(email, password).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           const user = response.data;
-
-          // Route based on role
           if (user.roles.includes('ADMIN') || user.roles.includes('OWNER')) {
             this.router.navigate(['/admin/dashboard']);
           } else if (user.roles.includes('DOCTOR')) {

@@ -8,13 +8,11 @@ const prescriptionItemSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
-
         dosage: {
             type: String,
             required: true,
             trim: true
         },
-
         duration: {
             type: String,
             required: true,
@@ -56,7 +54,6 @@ const medicalRecordSchema = new mongoose.Schema({
         required: ['true', "Diagnosis record is required"],
     },
     prescriptionItems: [prescriptionItemSchema],
-
     notes: {
         type: String,
         trim: true,
