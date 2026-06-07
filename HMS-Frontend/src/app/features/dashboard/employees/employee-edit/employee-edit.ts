@@ -11,7 +11,7 @@ import { Employee } from '../../../../core/models/employee.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './employee-edit.html',
-  styleUrl: './employee-edit.scss',   // ★ FIXED: singular, not styleUrls
+  styleUrl: './employee-edit.scss',   
 })
 export class EmployeeEditComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

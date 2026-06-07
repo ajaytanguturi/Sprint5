@@ -109,8 +109,6 @@ export class PatientListComponent implements OnInit {
   createPatient(): void {
     this.router.navigate([`${this.getBasePath()}/patients/create`]);
   }
-
-  // ✅ Clean async/await with modal
   async deletePatient(patientId: string, patientName: string): Promise<void> {
     const result = await this.confirmModal.open({
       title: 'Delete Patient',

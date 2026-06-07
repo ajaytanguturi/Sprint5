@@ -28,7 +28,6 @@ export class PatientDetailComponent implements OnInit {
   loading = true;
   appointmentsLoading = false;
 
-  // Edit mode
   editMode = false;
   editForm!: FormGroup;
   editLoading = false;
@@ -36,7 +35,6 @@ export class PatientDetailComponent implements OnInit {
   editSuccessMessage = '';
   genders = GENDERS;
 
-  // Active tab
   activeTab: 'details' | 'appointments' | 'edit' = 'details';
 
   ngOnInit(): void {

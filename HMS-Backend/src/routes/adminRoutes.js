@@ -17,7 +17,7 @@ const createEmployeeRules = [
     body('designation').trim().notEmpty().withMessage('Designation is required'),
     body('roles').isArray({ min: 1 }).withMessage('At least one role is required'),
     body('consultationFee')
-        .optional()
+        .optional({ nullable: true })
         .isFloat({ min: 0 })
         .withMessage('Consultation fee must be a non-negative number'),
 ];
@@ -33,5 +33,6 @@ router.put('/approve/:userId', approveEmployee);
 router.put('/reject/:userId', rejectRules, validate, rejectEmployee);
 router.post('/create-employee', createEmployeeRules, validate, createEmployeeWithTempPassword);
 router.get('/users', getAllUsers);
+
 
 module.exports = router;

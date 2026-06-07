@@ -13,16 +13,23 @@
           <div class="form-group">
             <label for="name" class="form-label">Full Name *</label>
             <input type="text" id="name" formControlName="name" class="form-input" placeholder="John Doe" />
-            @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+            @if (registerForm.get('name')?.touched) {
+
+            @if (registerForm.get('name')?.errors?.['required']) {
             <p class="form-error">Name is required</p>
+            }
+
+            @else if (registerForm.get('name')?.errors?.['pattern']) {
+            <p class="form-error">Name should contain only letters</p>
+            }
+
             }
           </div>
 
           <!-- Email -->
           <div class="form-group">
             <label for="email" class="form-label">Email *</label>
-            <input type="email" id="email" formControlName="email" class="form-input"
-              placeholder="john.doe@hospital.com" />
+            <input type="email" id="email" formControlName="email" class="form-input" placeholder="some@mail.com" />
             @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
             <p class="form-error">Valid email is required</p>
             }
@@ -32,8 +39,23 @@
           <div class="form-group">
             <label for="phone" class="form-label">Phone *</label>
             <input type="tel" id="phone" formControlName="phone" class="form-input" placeholder="+1234567890" />
-            @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+            @if (registerForm.get('phone')?.touched) {
+
+            @if (registerForm.get('phone')?.errors?.['required']) {
             <p class="form-error">Phone Number is required</p>
+            }
+
+            @else if (registerForm.get('phone')?.errors?.['pattern']) {
+            <p class="form-error">Only digits are allowed</p>
+            }
+
+            @else if (
+            registerForm.get('phone')?.errors?.['minlength'] ||
+            registerForm.get('phone')?.errors?.['maxlength']
+            ) {
+            <p class="form-error">Phone Number must be 10 digits</p>
+            }
+
             }
           </div>
 
@@ -70,8 +92,16 @@
             <label for="designation" class="form-label">Designation *</label>
             <input type="text" id="designation" formControlName="designation" class="form-input"
               placeholder="Senior Doctor" />
-            @if (registerForm.get('designation')?.invalid && registerForm.get('designation')?.touched) {
+            @if (registerForm.get('designation')?.touched) {
+
+            @if (registerForm.get('designation')?.errors?.['required']) {
             <p class="form-error">Designation is required</p>
+            }
+
+            @else if (registerForm.get('designation')?.errors?.['pattern']) {
+            <p class="form-error">Designation should contain only letters</p>
+            }
+
             }
           </div>
 
@@ -103,7 +133,7 @@
 
           <!--Qualifications -->
           <div class="form-group form-group-full">
-            <label for="qualifications" class="form-label">Qualifications</label>
+            <label for="qualifications" class="form-label">Qualifications *</label>
             <div class="chip-list">
               @for (chip of qualificationChips; track chip; let i = $index) {
               <span class="chip">
@@ -117,6 +147,11 @@
                 [ngModelOptions]="{ standalone: true }" class="form-input chip-input" placeholder="e.g. MBBS, MD"
                 (keyup.enter)="addQualification(); $event.preventDefault()" />
               <button type="button" (click)="addQualification()" class="btn btn-secondary btn-sm">Add</button>
+              @if (qualificationError) {
+              <p class="form-error">
+                {{ qualificationError }}
+              </p>
+              }
             </div>
           </div>
 
@@ -128,7 +163,6 @@
               Add time slots in HH:MM-HH:MM format (e.g. 09:00-12:00)
             </p>
 
-            <!-- Chip list -->
             <div class="chip-list">
               @for (slot of availabilityChips; track slot; let i = $index) {
               <span class="chip chip-slot">
@@ -165,9 +199,18 @@
           <div class="form-group">
             <label for="password" class="form-label">Password *</label>
             <input type="password" id="password" formControlName="password" class="form-input"
-              placeholder="Min 8 characters" />
-            @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+              placeholder="Min 8 characters" (input)="checkPasswordStrength()" />
+            @if (registerForm.get('password')?.errors?.['required']
+            && registerForm.get('password')?.touched) {
+            <p class="form-error">Password is required</p>
+            }
+            @if (registerForm.get('password')?.errors?.['minlength']
+            && registerForm.get('password')?.touched) {
             <p class="form-error">Password must be at least 8 characters</p>
+            }
+            @if (registerForm.get('password')?.value) {
+            <p class="form-error" [style.color]="passwordStrengthColor">Password Strength: {{passwordStrength }}
+            </p>
             }
           </div>
 
@@ -176,9 +219,14 @@
             <label for="confirmPassword" class="form-label">Confirm Password *</label>
             <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-input"
               placeholder="Confirm password" />
-            @if (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
+            @if (registerForm.hasError('passwordMismatch') &&registerForm.get('confirmPassword')?.touched) {
             <p class="form-error">Passwords do not match</p>
             }
+            @if (!registerForm.hasError('passwordMismatch')&& registerForm.get('confirmPassword')?.touched &&
+            registerForm.get('confirmPassword')?.value) {
+            <p class="form-error" style="color: green;">Passwords matched</p>
+            }
+
           </div>
         </div>
 

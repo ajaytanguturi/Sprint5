@@ -124,7 +124,7 @@ const createEmployeeWithTempPassword = async (req, res) => {
             resolvedEmployeeId = employee._id;
         }
         const tempPassword = generateTemporaryPassword();
-        const passwordHash = await bcrypt.hash(tempPassword, bcrypt.genSalt(saltRound));
+        const passwordHash = await bcrypt.hash(tempPassword, saltRound);
         const user = await new User({
             email: normalizedEmail,
             passwordHash,

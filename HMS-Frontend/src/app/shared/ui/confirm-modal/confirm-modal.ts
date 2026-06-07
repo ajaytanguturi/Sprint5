@@ -12,10 +12,7 @@ import { ConfirmModalService } from '../../../core/services/confirm-modal.servic
 })
 export class ConfirmModalComponent {
   modalService = inject(ConfirmModalService);
-
-  // Holds the input value typed by user (for reason/input modals)
   inputValue = signal('');
-
   onConfirm(): void {
     this.modalService.confirm(this.inputValue());
     this.inputValue.set('');
@@ -26,7 +23,6 @@ export class ConfirmModalComponent {
     this.inputValue.set('');
   }
 
-  // Close modal if user clicks the dark backdrop
   onBackdropClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target.classList.contains('modal-backdrop')) {

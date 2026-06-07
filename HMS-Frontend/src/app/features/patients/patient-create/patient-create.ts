@@ -23,16 +23,16 @@ export class PatientCreateComponent {
   loading = false;
   errorMessage = '';
   successMessage = '';
-
+  maxDobDate: string = new Date().toISOString().split('T')[0];
   genders = GENDERS;
 
   constructor() {
     this.patientForm = this.fb.group({
-      name: ['', Validators.required],
-      phone: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
       email: ['', [Validators.required, Validators.email]],
       gender: ['', Validators.required],
-      dob: ['', Validators.required],
+      dob: ['', Validators.required, this.futureDateValidator()],
       addressLine1: [''],
       addressCity: [''],
       addressPostcode: [''],
@@ -41,6 +41,20 @@ export class PatientCreateComponent {
       emergencyRelation: [''],
       medicalHistory: ['']
     });
+  }
+  futureDateValidator() {
+    return (control: any) => {
+      if (!control.value) return null;
+
+      const selectedDate = new Date(control.value);
+      const today = new Date();
+
+      today.setHours(23, 59, 59, 999);
+
+      return selectedDate > today
+        ? { futureDate: true }
+        : null;
+    };
   }
 
   onSubmit(): void {
@@ -60,8 +74,6 @@ export class PatientCreateComponent {
       dob: formValue.dob,
       medicalHistory: formValue.medicalHistory || ''
     };
-
-    // Address (only if any field filled)
     if (formValue.addressLine1 || formValue.addressCity || formValue.addressPostcode) {
       patientData.address = {
         line1: formValue.addressLine1,
@@ -69,8 +81,6 @@ export class PatientCreateComponent {
         postcode: formValue.addressPostcode
       };
     }
-
-    // Emergency contact (only if any field filled)
     if (formValue.emergencyName || formValue.emergencyPhone) {
       patientData.emergencyContact = {
         name: formValue.emergencyName,

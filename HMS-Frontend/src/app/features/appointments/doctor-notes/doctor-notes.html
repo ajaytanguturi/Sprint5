@@ -60,7 +60,7 @@
       <div class="form-actions">
         <button type="button" (click)="goBack()" class="btn btn-secondary">Cancel</button>
         <button type="submit" [disabled]="saving" class="btn btn-primary">
-          @if (saving) { <span>Saving...</span> } @else { <span>💾 Save Notes</span> }
+          @if (saving) { <span>Saving...</span> } @else { <span> Save Notes</span> }
         </button>
         @if (appointment.status === 'BOOKED') {
         <button type="button" (click)="completeAndSave()" [disabled]="saving" class="btn btn-success">

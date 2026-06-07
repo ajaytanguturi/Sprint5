@@ -24,17 +24,15 @@ export class AppointmentCreateComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
 
-  // Wizard step
   currentStep = 1;
   totalSteps = 5;
 
-  // Step 1: Patient
   patientSearchQuery = '';
   patientSearchResults: Patient[] = [];
   selectedPatient: Patient | null = null;
   searchingPatient = false;
+  noPatientFound = false;
 
-  // Step 2: Doctor
   availableDoctors: AvailableDoctor[] = [];
   selectedDoctor: AvailableDoctor | null = null;
   doctorFilter = '';
@@ -42,20 +40,17 @@ export class AppointmentCreateComponent implements OnInit {
   loadingDoctors = false;
   departments = DEPARTMENTS;
 
-  // Step 3: Date
   selectedDate = '';
   minDate = '';
+  maxDate = '';
 
-  // Step 4: Time Slot
   availableSlots: AvailableSlots | null = null;
   selectedSlot = '';
   loadingSlots = false;
 
-  // Step 5: Confirm
   appointmentForm: FormGroup;
   appointmentTypes = APPOINTMENT_TYPES;
 
-  // Submit
   submitting = false;
   errorMessage = '';
   successMessage = '';
@@ -67,33 +62,44 @@ export class AppointmentCreateComponent implements OnInit {
       consultationFee: [0, [Validators.required, Validators.min(0)]]
     });
 
-    // Set min date to today
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
+    const maxDate = new Date();;
+    maxDate.setDate(maxDate.getDate() + 30);
+    this.maxDate = maxDate.toISOString().split('T')[0];
   }
 
   ngOnInit(): void {
-    // Check if patientId passed via query params
     const patientId = this.route.snapshot.queryParamMap.get('patientId');
     if (patientId) {
       this.loadPatientById(patientId);
     }
   }
 
-  // --- Step 1: Patient Selection ---
-
   searchPatients(): void {
-    if (!this.patientSearchQuery || this.patientSearchQuery.trim().length < 2) return;
-
+    if (!this.patientSearchQuery || this.patientSearchQuery.trim().length < 2) {
+      this.patientSearchResults = [];
+      this.noPatientFound = false;
+      return;
+    }
     this.searchingPatient = true;
+    this.noPatientFound = false;
     this.patientService.searchPatients(this.patientSearchQuery.trim()).subscribe({
       next: (response) => {
-        if (response.success && response.data) {
-          this.patientSearchResults = response.data;
+        if (response.success) {
+          this.patientSearchResults = response.data || [];
+          this.noPatientFound = this.patientSearchResults.length === 0;
+        } else {
+          this.patientSearchResults = [];
+          this.noPatientFound = true;
         }
         this.searchingPatient = false;
       },
-      error: () => { this.searchingPatient = false; }
+      error: () => {
+        this.patientSearchResults = [];
+        this.noPatientFound = true;
+        this.searchingPatient = false;
+      }
     });
   }
 
@@ -114,15 +120,11 @@ export class AppointmentCreateComponent implements OnInit {
     this.nextStep();
   }
 
-  // --- Step 2: Doctor Selection ---
-
   loadDoctors(): void {
     this.loadingDoctors = true;
-
     const filters: any = {};
     if (this.doctorFilter) filters.specialization = this.doctorFilter;
     if (this.departmentFilter) filters.department = this.departmentFilter;
-
     this.appointmentService.getAvailableDoctors(filters).subscribe({
       next: (response) => {
         if (response.success && response.data) {
@@ -133,11 +135,9 @@ export class AppointmentCreateComponent implements OnInit {
       error: () => { this.loadingDoctors = false; }
     });
   }
-
   onDoctorFilterChange(): void {
     this.loadDoctors();
   }
-
   selectDoctor(doctor: AvailableDoctor): void {
     this.selectedDoctor = doctor;
     this.appointmentForm.patchValue({
@@ -145,8 +145,6 @@ export class AppointmentCreateComponent implements OnInit {
     });
     this.nextStep();
   }
-
-  // --- Step 3: Date Selection ---
 
   onDateChange(): void {
     if (this.selectedDate && this.selectedDoctor) {
@@ -159,8 +157,6 @@ export class AppointmentCreateComponent implements OnInit {
     this.loadAvailableSlots();
     this.nextStep();
   }
-
-  // --- Step 4: Time Slot Selection ---
 
   loadAvailableSlots(): void {
     if (!this.selectedDoctor || !this.selectedDate) return;
@@ -181,16 +177,11 @@ export class AppointmentCreateComponent implements OnInit {
     this.selectedSlot = slot;
     this.nextStep();
   }
-
-  // --- Step 5: Confirm & Submit ---
-
   onSubmit(): void {
     if (this.appointmentForm.invalid || !this.selectedPatient || !this.selectedDoctor || !this.selectedDate || !this.selectedSlot) return;
-
     this.submitting = true;
     this.errorMessage = '';
     this.successMessage = '';
-
     const appointmentData = {
       patientId: this.selectedPatient._id,
       doctorEmployeeId: this.selectedDoctor._id,
@@ -201,7 +192,6 @@ export class AppointmentCreateComponent implements OnInit {
       reasonForVisit: this.appointmentForm.value.reasonForVisit,
       consultationFee: this.appointmentForm.value.consultationFee
     };
-
     this.appointmentService.createAppointment(appointmentData).subscribe({
       next: (response) => {
         if (response.success) {
@@ -219,9 +209,6 @@ export class AppointmentCreateComponent implements OnInit {
       }
     });
   }
-
-  // --- Navigation ---
-
   nextStep(): void {
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
@@ -229,7 +216,6 @@ export class AppointmentCreateComponent implements OnInit {
       if (this.currentStep === 2) this.loadDoctors();
     }
   }
-
   prevStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;

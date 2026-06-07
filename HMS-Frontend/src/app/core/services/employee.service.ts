@@ -47,30 +47,15 @@ export class EmployeeService {
     return this.http.get<ApiResponse<Employee[]>>(this.apiUrl, { params });
   }
 
-  /**
-   * Get a single employee by ID (for edit form pre-fill).
-   */
   getEmployeeById(id: string): Observable<ApiResponse<Employee>> {
     return this.http.get<ApiResponse<Employee>>(`${this.apiUrl}/${id}`);
   }
-
-  /**
-   * Create a new employee.
-   */
   createEmployee(data: Partial<Employee>): Observable<ApiResponse<Employee>> {
     return this.http.post<ApiResponse<Employee>>(this.apiUrl, data);
   }
-
-  /**
-   * Update an existing employee.
-   */
   updateEmployee(id: string, data: Partial<Employee>): Observable<ApiResponse<Employee>> {
     return this.http.put<ApiResponse<Employee>>(`${this.apiUrl}/${id}`, data);
   }
-
-  /**
-   * Toggle employee ACTIVE ↔ INACTIVE status.
-   */
   toggleStatus(id: string): Observable<ApiResponse<Employee>> {
     return this.http.patch<ApiResponse<Employee>>(`${this.apiUrl}/${id}/status`, {});
   }

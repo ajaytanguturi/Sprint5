@@ -14,8 +14,16 @@
           <div class="form-group">
             <label for="name" class="form-label">Full Name *</label>
             <input type="text" id="name" formControlName="name" class="form-input" placeholder="Patient full name" />
-            @if (patientForm.get('name')?.invalid && patientForm.get('name')?.touched) {
+            @if (patientForm.get('name')?.touched) {
+
+            @if (patientForm.get('name')?.errors?.['required']) {
             <p class="form-error">Name is required</p>
+            }
+
+            @else if (patientForm.get('name')?.errors?.['pattern']) {
+            <p class="form-error">Name should contain only letters</p>
+            }
+
             }
           </div>
 
@@ -30,8 +38,17 @@
           <div class="form-group">
             <label for="phone" class="form-label">Phone *</label>
             <input type="tel" id="phone" formControlName="phone" class="form-input" placeholder="+919876543210" />
-            @if (patientForm.get('phone')?.invalid && patientForm.get('phone')?.touched) {
-            <p class="form-error">Phone is required</p>
+            @if (patientForm.get('phone')?.touched) {
+            @if (patientForm.get('phone')?.errors?.['required']) {
+            <p class="form-error">Phone Number is required</p>
+            }
+            @else if (patientForm.get('phone')?.errors?.['pattern']) {
+            <p class="form-error">Only digits are allowed</p>
+            }
+            @else if (patientForm.get('phone')?.errors?.['minlength']
+            ||patientForm.get('phone')?.errors?.['maxlength']){
+            <p class="form-error">Phone Number must be 10 digits</p>
+            }
             }
           </div>
 
@@ -50,9 +67,14 @@
 
           <div class="form-group">
             <label for="dob" class="form-label">Date of Birth *</label>
-            <input type="date" id="dob" formControlName="dob" class="form-input" />
-            @if (patientForm.get('dob')?.invalid && patientForm.get('dob')?.touched) {
+            <input type="date" id="dob" formControlName="dob" class="form-input" [max]="maxDobDate" />
+            @if (patientForm.get('dob')?.errors?.['required'] &&patientForm.get('dob')?.touched) {
             <p class="form-error">Date of birth is required</p>
+            }
+            @if (patientForm.get('dob')?.errors?.['futureDate']) {
+            <p class="form-error">
+              Date of birth cannot be a future date
+            </p>
             }
           </div>
         </div>

@@ -57,6 +57,11 @@
       }
     </div>
     }
+    @if (noPatientFound) {
+    <div class="no-results">
+      No patient found
+    </div>
+    }
   </div>
   } @else {
   <div class="selected-info">
@@ -129,7 +134,8 @@
 
   <div class="date-picker-section">
     <label for="appointmentDate" class="form-label">Appointment Date</label>
-    <input type="date" id="appointmentDate" [(ngModel)]="selectedDate" [min]="minDate" class="form-input date-input" />
+    <input type="date" id="appointmentDate" [(ngModel)]="selectedDate" [min]="minDate" [max]="maxDate"
+      class="form-input date-input" />
   </div>
 
   @if (selectedDate) {

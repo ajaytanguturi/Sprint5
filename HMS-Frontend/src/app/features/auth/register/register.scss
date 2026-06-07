@@ -28,12 +28,10 @@
   }
 }
 
-/* Full-width form group (for chips that span both columns) */
 .form-group-full {
   grid-column: 1 / -1;
 }
 
-/* ── Chip system ─────────────────────────────────────────── */
 .chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -88,7 +86,6 @@
   flex: 1;
 }
 
-/* ── Quick-add section ───────────────────────────────────── */
 .quick-add-section {
   margin-top: 10px;
 }
@@ -127,14 +124,12 @@
   }
 }
 
-/* ── Section hint ────────────────────────────────────────── */
 .section-hint {
   font-size: 12px;
   color: #94a3b8;
   margin: 0 0 8px 0;
 }
 
-/* ── Form select (match input style) ─────────────────────── */
 .form-select {
   padding: 8px 12px;
   border: 1px solid #cbd5e1;

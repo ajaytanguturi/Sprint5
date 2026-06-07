@@ -159,8 +159,6 @@ export class AppointmentListComponent implements OnInit {
   addNotes(appointmentId: string): void {
     this.router.navigate([`${this.getBasePath()}/appointments`, appointmentId, 'notes']);
   }
-
-  //Clean async/await with modal
   async cancelAppointment(appointmentId: string): Promise<void> {
     const result = await this.confirmModal.open({
       title: 'Cancel Appointment',
@@ -172,9 +170,7 @@ export class AppointmentListComponent implements OnInit {
       inputLabel: 'Reason for cancellation (optional)',
       inputPlaceholder: 'e.g. Patient requested reschedule...'
     });
-
     if (!result.confirmed) return;
-
     this.appointmentService.cancelAppointment(
       appointmentId,
       result.inputValue?.trim() || 'No reason provided'
@@ -193,7 +189,6 @@ export class AppointmentListComponent implements OnInit {
     });
   }
 
-  // Clean async/await with modal
   async completeAppointment(appointmentId: string): Promise<void> {
     const result = await this.confirmModal.open({
       title: 'Complete Appointment',

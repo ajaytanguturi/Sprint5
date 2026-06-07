@@ -29,9 +29,9 @@ export class AdminCreateEmployeeComponent {
   selectedRole: string = '';
   showDoctorFields = false;
 
-  // Doctor-only chips
   qualificationChips: string[] = [];
   newQualification = '';
+  qualificationError = '';
 
   availabilityChips: string[] = [];
   newAvailabilitySlot = '';
@@ -43,11 +43,11 @@ export class AdminCreateEmployeeComponent {
 
   constructor() {
     this.createForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      department: ['', Validators.required],
-      designation: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
+      department: ['', [Validators.required]],
+      designation: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
       roles: ['', Validators.required],
       medicalRegistrationNo: [''],
       specialization: [''],
@@ -69,10 +69,18 @@ export class AdminCreateEmployeeComponent {
   }
 
   addQualification(): void {
-    const trimmed = this.newQualification.trim();
-    if (trimmed && !this.qualificationChips.includes(trimmed)) {
-      this.qualificationChips = [...this.qualificationChips, trimmed];
+    const qualification = this.newQualification.trim();
+    if (!qualification) {
+      return;
     }
+    const qualificationPattern = /^[A-Za-z\s,.]+$/;
+    if (!qualificationPattern.test(qualification)) {
+      this.qualificationError =
+        'Qualification should contain only letters';
+      return;
+    }
+    this.qualificationError = '';
+    this.qualificationChips.push(qualification);
     this.newQualification = '';
   }
 

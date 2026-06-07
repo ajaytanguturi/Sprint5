@@ -20,35 +20,27 @@ export class EmployeeListComponent implements OnInit {
   private readonly confirmModal = inject(ConfirmModalService);
   private readonly toastService = inject(ToastService);
 
-  // ── Data ────────────────────────────────────────────────────
+
   employees: Employee[] = [];
 
-  // ── Pagination ──────────────────────────────────────────────
   currentPage = 1;
   totalPages = 1;
   totalEmployees = 0;
   limit = 10;
 
-  // ── Filters ─────────────────────────────────────────────────
   statusFilter = '';
   departmentFilter = '';
 
-  // ── Search ──────────────────────────────────────────────────
   searchQuery = '';
   searchResults: Employee[] = [];
   isSearching = false;
   showSearchResults = false;
-
-  // ── Loading ─────────────────────────────────────────────────
   loading = false;
 
   ngOnInit(): void {
     this.loadEmployees();
   }
 
-  // ────────────────────────────────────────────────────────────
-  // LOAD EMPLOYEES (with filters + pagination)
-  // ────────────────────────────────────────────────────────────
   loadEmployees(): void {
     this.loading = true;
     this.showSearchResults = false;
@@ -72,9 +64,6 @@ export class EmployeeListComponent implements OnInit {
       });
   }
 
-  // ────────────────────────────────────────────────────────────
-  // SEARCH (wired to backend via same getEmployees endpoint)
-  // ────────────────────────────────────────────────────────────
   onSearch(): void {
     if (!this.searchQuery || this.searchQuery.trim().length < 2) {
       this.showSearchResults = false;
@@ -82,10 +71,8 @@ export class EmployeeListComponent implements OnInit {
       this.loadEmployees();
       return;
     }
-
     this.isSearching = true;
     this.showSearchResults = true;
-
     this.employeeService
       .getEmployees(1, 50, undefined, this.searchQuery.trim())
       .subscribe({
@@ -106,26 +93,16 @@ export class EmployeeListComponent implements OnInit {
     this.loadEmployees();
   }
 
-  // ────────────────────────────────────────────────────────────
-  // FILTERS
-  // ────────────────────────────────────────────────────────────
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadEmployees();
   }
-
-  // ────────────────────────────────────────────────────────────
-  // PAGINATION
-  // ────────────────────────────────────────────────────────────
   onPageChange(page: number): void {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
     this.loadEmployees();
   }
 
-  // ────────────────────────────────────────────────────────────
-  // ACTIONS
-  // ────────────────────────────────────────────────────────────
   createEmployee(): void {
     this.router.navigate(['/admin/employees/create']);
   }
@@ -134,18 +111,12 @@ export class EmployeeListComponent implements OnInit {
     this.router.navigate(['/admin/employees/edit', id]);
   }
 
-  /**
-   * Toggle ACTIVE / INACTIVE with confirmation modal.
-   * Guards against undefined _id with an early return.
-   */
   async toggleStatus(employee: Employee): Promise<void> {
-    // Guard: ensure we have an ID before proceeding
     const employeeId = employee._id;
     if (!employeeId) {
       this.toastService.error('Employee ID is missing');
       return;
     }
-
     const newStatus = employee.status === 'ACTIVE' ? 'deactivate' : 'activate';
     const result = await this.confirmModal.open({
       title: newStatus === 'deactivate' ? 'Deactivate Employee' : 'Activate Employee',

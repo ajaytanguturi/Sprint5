@@ -12,12 +12,9 @@ export class AppointmentService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/appointments`;
 
-  // --- Appointment CRUD ---
-
   createAppointment(data: any): Observable<ApiResponse<Appointment>> {
     return this.http.post<ApiResponse<Appointment>>(this.apiUrl, data);
   }
-
   getAllAppointments(page: number = 1, limit: number = 10, filters?: any): Observable<ApiResponse<Appointment[]>> {
     let params = new HttpParams()
       .set('page', page.toString())

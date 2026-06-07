@@ -5,7 +5,6 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  // --- Public Routes ---
   {
     path: '',
     loadComponent: () => import('./features/home/home').then((m) => m.HomeComponent),
@@ -32,7 +31,6 @@ export const routes: Routes = [
       import('./features/auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
   },
 
-  // --- Admin Routes ---
   {
     path: 'admin/dashboard',
     loadComponent: () =>
@@ -128,9 +126,6 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard, roleGuard(['ADMIN', 'OWNER'])],
   },
-
-  // IMPORTANT: /admin/employees/edit/:id MUST come BEFORE /admin/employees/:id
-  // so Angular matches the more-specific route first.
   {
     path: 'admin/employees/edit/:id',
     loadComponent: () =>
@@ -148,7 +143,6 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['ADMIN', 'OWNER'])],
   },
 
-  // --- Receptionist Routes ---
   {
     path: 'receptionist/dashboard',
     loadComponent: () =>
@@ -230,7 +224,6 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['RECEPTIONIST'])],
   },
 
-  // --- Doctor Routes ---
   {
     path: 'doctor/dashboard',
     loadComponent: () =>
@@ -266,7 +259,6 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['DOCTOR'])],
   },
 
-  // --- Fallback ---
   {
     path: 'dashboard',
     redirectTo: () => inject(AuthService).getDashboardRoute(),

@@ -29,11 +29,14 @@ export class RegisterComponent {
 
   qualificationChips: string[] = [];
   newQualification = '';
+  qualificationError = '';
 
   availabilityChips: string[] = [];
   newAvailabilitySlot = '';
 
-  // Pre-built common time slots for quick add
+  passwordStrength = '';
+  passwordStrengthColor = 'red';
+
   commonTimeSlots = [
     '09:00-12:00',
     '09:00-13:00',
@@ -47,22 +50,57 @@ export class RegisterComponent {
 
     this.registerForm = this.fb.group(
       {
-        name: ['', Validators.required],
+        name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
         email: ['', [Validators.required, Validators.email]],
-        phone: ['', Validators.required],
+        phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
         department: ['', Validators.required],
-        designation: ['', Validators.required],
+        designation: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
         roles: ['', Validators.required],
         medicalRegistrationNo: [''],
         specialization: [''],
         consultationFee: [null],
-        password: ['', [Validators.required, Validators.minLength(8)]],
+        password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)]],
         confirmPassword: ['', Validators.required],
       },
       { validators: this.passwordMatchValidator },
     );
   }
 
+  checkPasswordStrength(): void {
+
+    const password = this.registerForm.get('password')?.value || '';
+
+    let score = 0;
+
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[@$!%*?&]/.test(password)) score++;
+
+    switch (score) {
+      case 0:
+      case 1:
+      case 2:
+        this.passwordStrength = 'Weak';
+        this.passwordStrengthColor = 'red';
+        break;
+
+      case 3:
+      case 4:
+        this.passwordStrength = 'Medium';
+        this.passwordStrengthColor = 'orange';
+        break;
+
+      case 5:
+        this.passwordStrength = 'Strong';
+        this.passwordStrengthColor = 'green';
+        break;
+
+      default:
+        this.passwordStrength = '';
+    }
+  }
   passwordMatchValidator(control: AbstractControl) {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
@@ -79,16 +117,25 @@ export class RegisterComponent {
     this.showMedicalFields = ['DOCTOR', 'NURSE', 'LAB_TECH', 'PHARMACIST'].includes(role);
   }
   addQualification(): void {
-    const trimmed = this.newQualification.trim();
-    if (trimmed && !this.qualificationChips.includes(trimmed)) {
-      this.qualificationChips = [...this.qualificationChips, trimmed];
+    const qualification = this.newQualification.trim();
+    if (!qualification) {
+      return;
     }
+    const qualificationPattern = /^[A-Za-z\s,.]+$/;
+    if (!qualificationPattern.test(qualification)) {
+      this.qualificationError =
+        'Qualification should contain only letters';
+      return;
+    }
+    this.qualificationError = '';
+    this.qualificationChips.push(qualification);
     this.newQualification = '';
   }
 
   removeQualification(index: number): void {
     this.qualificationChips = this.qualificationChips.filter((_, i) => i !== index);
   }
+
   addAvailabilitySlot(): void {
     const trimmed = this.newAvailabilitySlot.trim();
     const regex = /^\d{2}:\d{2}-\d{2}:\d{2}$/;
@@ -116,10 +163,12 @@ export class RegisterComponent {
   removeAvailabilitySlot(index: number): void {
     this.availabilityChips = this.availabilityChips.filter((_, i) => i !== index);
   }
-
-  // ── Submit ────────────────────────────────────────────────────
   onSubmit(): void {
     if (this.registerForm.invalid) return;
+    if (this.qualificationChips.length === 0) {
+      this.errorMessage = 'At least one qualification is required';
+      return;
+    }
 
     this.loading = true;
     this.errorMessage = '';
@@ -128,14 +177,9 @@ export class RegisterComponent {
     const formData = { ...this.registerForm.value };
     delete formData.confirmPassword;
 
-    // Role → array
     formData.roles = [formData.roles];
-
-    // ★ Qualification: send chip array (fall back to empty array)
     formData.qualification =
       this.qualificationChips.length > 0 ? this.qualificationChips : [];
-
-    // ★ Availability slots: send chip array
     formData.availabilitySlots =
       this.availabilityChips.length > 0 ? this.availabilityChips : [];
 

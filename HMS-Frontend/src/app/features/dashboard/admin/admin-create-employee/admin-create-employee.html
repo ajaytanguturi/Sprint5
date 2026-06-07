@@ -11,18 +11,42 @@
           <div class="form-group">
             <label for="name" class="form-label">Full Name *</label>
             <input type="text" id="name" formControlName="name" class="form-input" />
+            @if (createForm.get('name')?.touched) {
+
+            @if (createForm.get('name')?.errors?.['required']) {
+            <p class="form-error">Name is required</p>
+            }
+            @else if (createForm.get('name')?.errors?.['pattern']) {
+            <p class="form-error">Name should contain only letters</p>
+            }
+            }
           </div>
 
           <!-- Email -->
           <div class="form-group">
             <label for="email" class="form-label">Email *</label>
             <input type="email" id="email" formControlName="email" class="form-input" />
+            @if (createForm.get('email')?.invalid && createForm.get('email')?.touched) {
+            <p class="form-error">Valid email is required</p>
+            }
           </div>
 
           <!-- Phone -->
           <div class="form-group">
             <label for="phone" class="form-label">Phone *</label>
             <input type="tel" id="phone" formControlName="phone" class="form-input" />
+            @if (createForm.get('phone')?.touched) {
+            @if (createForm.get('phone')?.errors?.['required']) {
+            <p class="form-error">Phone Number is required</p>
+            }
+            @else if (createForm.get('phone')?.errors?.['pattern']) {
+            <p class="form-error">Only digits are allowed</p>
+            }
+            @else if (createForm.get('phone')?.errors?.['minlength']
+            ||createForm.get('phone')?.errors?.['maxlength']) {
+            <p class="form-error">Phone Number must be 10 digits</p>
+            }
+            }
           </div>
 
           <!-- Department -->
@@ -34,6 +58,9 @@
               <option [value]="dept">{{ dept }}</option>
               }
             </select>
+            @if (createForm.get('department')?.invalid && createForm.get('department')?.touched) {
+            <p class="form-error">Department is required</p>
+            }
           </div>
 
           <!-- Role (with change handler) -->
@@ -45,12 +72,23 @@
               <option [value]="role">{{ role }}</option>
               }
             </select>
+            @if (createForm.get('roles')?.invalid && createForm.get('roles')?.touched) {
+            <p class="form-error">Role is required</p>
+            }
           </div>
 
           <!-- Designation -->
           <div class="form-group">
             <label for="designation" class="form-label">Designation *</label>
             <input type="text" id="designation" formControlName="designation" class="form-input" />
+            @if (createForm.get('designation')?.touched) {
+            @if (createForm.get('designation')?.errors?.['required']) {
+            <p class="form-error">Designation is required</p>
+            }
+            @else if (createForm.get('designation')?.errors?.['pattern']) {
+            <p class="form-error">Designation should contain only letters</p>
+            }
+            }
           </div>
 
           <!-- === DOCTOR-ONLY FIELDS (hidden for other roles) === -->
@@ -77,26 +115,6 @@
             <input type="number" id="consultationFee" formControlName="consultationFee" class="form-input"
               placeholder="500" min="0" />
           </div>
-
-          <!-- Qualifications (chips) -->
-          <div class="form-group form-group-full">
-            <label for="qualifications" class="form-label">Qualifications</label>
-            <div class="chip-list">
-              @for (chip of qualificationChips; track chip; let i = $index) {
-              <span class="chip">
-                {{ chip }}
-                <button type="button" (click)="removeQualification(i)" class="chip-remove">✕</button>
-              </span>
-              }
-            </div>
-            <div class="chip-add-row">
-              <input type="text" [(ngModel)]="newQualification" [ngModelOptions]="{ standalone: true }"
-                class="form-input chip-input" placeholder="e.g. MBBS, MD"
-                (keyup.enter)="addQualification(); $event.preventDefault()" />
-              <button type="button" (click)="addQualification()" class="btn btn-secondary btn-sm">Add</button>
-            </div>
-          </div>
-
           <!-- Availability Slots (chips) -->
           <div class="form-group form-group-full">
             <label for="availabilitySlots" class="form-label">Availability Slots</label>
@@ -135,18 +153,34 @@
           </div>
 
           }
-
+          <div class="form-group form-group-full">
+            <label for="qualifications" class="form-label">Qualifications</label>
+            <div class="chip-list">
+              @for (chip of qualificationChips; track chip; let i = $index) {
+              <span class="chip">{{ chip }}
+                <button type="button" (click)="removeQualification(i)" class="chip-remove">✕</button>
+              </span>
+              }
+            </div>
+            <div class="chip-add-row">
+              <input type="text" [(ngModel)]="newQualification" [ngModelOptions]="{ standalone: true }"
+                class="form-input chip-input" placeholder="e.g. MBBS, MD"
+                (keyup.enter)="addQualification(); $event.preventDefault()" />
+              <button type="button" (click)="addQualification()" class="btn btn-secondary btn-sm">Add</button>
+              @if (qualificationError) {
+              <p class="form-error">
+                {{ qualificationError }}
+              </p>
+              }
+            </div>
+          </div>
         </div>
-
-        <!-- Messages -->
         @if (errorMessage) {
         <div class="alert alert-error">{{ errorMessage }}</div>
         }
         @if (successMessage) {
         <div class="alert alert-success">{{ successMessage }}</div>
         }
-
-        <!-- Submit -->
         <div class="form-actions">
           <button type="submit" [disabled]="createForm.invalid || loading" class="btn btn-primary">
             @if (loading) { Creating... } @else { Create Employee }

@@ -42,8 +42,6 @@ export class AppointmentDetailComponent implements OnInit {
       error: () => { this.loading = false; }
     });
   }
-
-  // Replaced confirm + alert with modal + toast
   async completeAppointment(): Promise<void> {
     if (!this.appointment) return;
 
@@ -54,9 +52,7 @@ export class AppointmentDetailComponent implements OnInit {
       cancelText: 'Go Back',
       type: 'success'
     });
-
     if (!result.confirmed) return;
-
     this.appointmentService.updateAppointmentStatus(
       this.appointment._id, 'COMPLETED'
     ).subscribe({
@@ -73,11 +69,8 @@ export class AppointmentDetailComponent implements OnInit {
       }
     });
   }
-
-  // Replaced prompt + alert with modal (with input) + toast
   async cancelAppointment(): Promise<void> {
     if (!this.appointment) return;
-
     const result = await this.confirmModal.open({
       title: 'Cancel Appointment',
       message: 'Are you sure you want to cancel this appointment?',
@@ -88,9 +81,7 @@ export class AppointmentDetailComponent implements OnInit {
       inputLabel: 'Reason for cancellation (optional)',
       inputPlaceholder: 'e.g. Patient requested reschedule...'
     });
-
     if (!result.confirmed) return;
-
     this.appointmentService.cancelAppointment(
       this.appointment._id,
       result.inputValue?.trim() || 'No reason provided'
@@ -108,7 +99,6 @@ export class AppointmentDetailComponent implements OnInit {
       }
     });
   }
-
   addNotes(): void {
     this.router.navigate([
       `${this.getBasePath()}/appointments`,
@@ -116,11 +106,9 @@ export class AppointmentDetailComponent implements OnInit {
       'notes'
     ]);
   }
-
   goBack(): void {
     this.router.navigate([`${this.getBasePath()}/appointments`]);
   }
-
   getStatusClass(status: string): string {
     switch (status) {
       case 'BOOKED': return 'status-booked';
@@ -129,11 +117,9 @@ export class AppointmentDetailComponent implements OnInit {
       default: return '';
     }
   }
-
   isDoctor(): boolean { return this.authService.hasRole(['DOCTOR']); }
   canCancel(): boolean { return this.authService.hasRole(['RECEPTIONIST', 'ADMIN', 'OWNER']); }
   canAddNotes(): boolean { return this.authService.hasRole(['DOCTOR', 'ADMIN', 'OWNER']); }
-
   private getBasePath(): string {
     if (this.authService.hasRole(['ADMIN', 'OWNER'])) return '/admin';
     if (this.authService.hasRole(['DOCTOR'])) return '/doctor';

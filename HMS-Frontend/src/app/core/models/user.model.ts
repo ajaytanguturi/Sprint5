@@ -70,22 +70,15 @@ export const ADMIN_SIDEBAR: SidebarItem[] = [
   { label: 'Dashboard', route: '/admin/dashboard', roles: ['ADMIN', 'OWNER'] },
   { label: 'Employees', route: '/admin/employees', roles: ['ADMIN', 'OWNER'] },
   { label: 'Approvals', route: '/admin/approvals', roles: ['ADMIN', 'OWNER'] },
-
-  //{ label: 'Create Employee', route: '/admin/create-employee', roles: ['ADMIN', 'OWNER'] },
   { label: 'Patients', route: '/admin/patients', roles: ['ADMIN', 'OWNER'] },
   { label: 'Appointments', route: '/admin/appointments', roles: ['ADMIN', 'OWNER'] },
-  //{ label: 'Today\'s Appointments', route: '/admin/appointments/today', roles: ['ADMIN', 'OWNER'] },
-  //{ label: 'Book Appointment', route: '/admin/book-appointment', roles: ['ADMIN', 'OWNER'] },
   { label: 'Profile', route: '/admin/profile', roles: ['ADMIN', 'OWNER'] },
 ];
 
 export const RECEPTIONIST_SIDEBAR: SidebarItem[] = [
   { label: 'Dashboard', route: '/receptionist/dashboard', roles: ['RECEPTIONIST'] },
   { label: 'Patients', route: '/receptionist/patients', roles: ['RECEPTIONIST'] },
-  //{ label: 'Search Patient', route: '/receptionist/patients/search', roles: ['RECEPTIONIST'] },
   { label: 'Appointments', route: '/receptionist/appointments', roles: ['RECEPTIONIST'] },
-  //{ label: 'Today\'s Appointments', route: '/receptionist/appointments/today', roles: ['RECEPTIONIST'] },
-  //{ label: 'Book Appointment', route: '/receptionist/book-appointment', roles: ['RECEPTIONIST'] },
   { label: 'Profile', route: '/receptionist/profile', roles: ['RECEPTIONIST'] },
 ];
 

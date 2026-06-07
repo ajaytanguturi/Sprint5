@@ -83,11 +83,8 @@ export class DoctorNotesComponent implements OnInit {
 
     this.saving = true;
     this.errorMessage = '';
-
-    // Save notes first
     this.appointmentService.addDoctorNotes(this.appointment._id, this.notesForm.value).subscribe({
       next: () => {
-        // Then mark as completed
         this.appointmentService.updateAppointmentStatus(this.appointment!._id, 'COMPLETED').subscribe({
           next: () => {
             this.successMessage = 'Notes saved and appointment completed!';

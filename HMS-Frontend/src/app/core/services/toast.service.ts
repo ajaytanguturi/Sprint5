@@ -18,13 +18,11 @@ export class ToastService {
   getToasts(): Toast[] {
     return this.toasts();
   }
-
   show(message: string, type: ToastType = 'info', duration = 3000): void {
     const id = ++this.counter;
     this.toasts.update((t) => [...t, { id, message, type }]);
     setTimeout(() => this.remove(id), duration);
   }
-
   success(message: string): void {
     this.show(message, 'success');
   }

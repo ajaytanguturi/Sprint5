@@ -22,8 +22,6 @@ export class NavbarComponent {
       this.currentUser = user;
     });
   }
-
-  // Hide navbar when user is logged in (sidebar takes over)
   get showNavbar(): boolean {
     return !this.currentUser;
   }
