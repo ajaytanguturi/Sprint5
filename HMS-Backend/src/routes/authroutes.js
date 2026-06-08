@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, selfRegister, login, getMe, forgotPassword, resetPassword, changePassword } = require('../controllers/authController');
+const { register, selfRegister, login, getMe, forgotPassword, resetPassword, changePassword, patientRegister } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { validate } = require('../middleware/validate');
 
@@ -19,6 +19,15 @@ const selfRegisterRules = [
     body('department').trim().notEmpty().withMessage('Department is required'),
     body('designation').trim().notEmpty().withMessage('Designation is required'),
     body('roles').isArray({ min: 1 }).withMessage('At least one role is required'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+];
+
+const patientRegisterRules = [
+    body('name').trim().notEmpty().withMessage('Full name is required'),
+    body('email').isEmail().withMessage('A valid email is required').normalizeEmail(),
+    body('phone').matches(/^\d{10}$/).withMessage('Phone must be a 10-digit number'),
+    body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Gender must be Male, Female, or Other'),
+    body('dob').isISO8601().withMessage('Date of birth must be a valid date (YYYY-MM-DD)'),
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
 ];
 
@@ -51,6 +60,7 @@ const changePasswordRules = [
 
 router.post('/register', registerRules, validate, register);
 router.post('/self-register', selfRegisterRules, validate, selfRegister);
+router.post('/patient-register', patientRegisterRules, validate, patientRegister);
 router.post('/login', loginRules, validate, login);
 router.post('/forgot-password', forgotPasswordRules, validate, forgotPassword);
 router.post('/reset-password', resetPasswordRules, validate, resetPassword);

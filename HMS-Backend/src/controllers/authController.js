@@ -4,9 +4,11 @@ const User = require('../models/userModel');
 const Employee = require('../models/employeeModel');
 const { generateAccessToken, generateRefreshToken, generatePasswordResetToken, } = require('../utils/generateToken');
 const { sendRegistrationPendingEmail, sendAdminNotificationEmail, sendPasswordResetEmail } = require('../utils/emailService');
+const Patient = require('../models/patientModel');
+const mongoose = require('mongoose');
 
 // constants
-const VALID_ROLES = ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST'];
+const VALID_ROLES = ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST', 'PATIENT'];
 const ADMIN_ROLES = new Set(['OWNER', 'ADMIN']);
 const SALT_ROUNDS = 12;
 
@@ -19,6 +21,7 @@ const buildTokenPayload = (user) => ({
     roles: user.roles,
     status: user.status,
     employeeId: user.employeeId || null,
+    patientId: user.patientId || null,
 });
 
 const validateRoles = (roles) => {
@@ -175,12 +178,86 @@ const selfRegister = async (req, res) => {
     }
 };
 
+const patientRegister = async (req, res) => {
+    try {
+        const { name, email, phone, gender, dob, password } = req.body;
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const [existingUser, existingPatient] = await Promise.all([
+            User.findOne({ email: normalizedEmail }),
+            Patient.findOne({ email: normalizedEmail }),
+        ]);
+
+        if (existingUser || existingPatient) {
+            return res.status(409).json({ success: false, message: `Email "${email}" is already registered` });
+        }
+
+        const dobDate = new Date(dob);
+        if (dobDate > new Date()) {
+            return res.status(400).json({ success: false, message: 'Date of birth cannot be in the future' });
+        }
+
+        // Generate matching ObjectIds beforehand to prevent validation hook failures
+        const userId = new mongoose.Types.ObjectId();
+        const patientId = new mongoose.Types.ObjectId();
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        // 1. Create Patient profile
+        const patient = new Patient({
+            _id: patientId,
+            name,
+            phone: phone.trim(),
+            email: normalizedEmail,
+            gender,
+            dob: dobDate,
+            registeredBy: userId,
+            status: 'ACTIVE',
+        });
+        await patient.save();
+
+        // 2. Create User account
+        const user = new User({
+            _id: userId,
+            email: normalizedEmail,
+            passwordHash,
+            roles: ['PATIENT'],
+            patientId: patientId,
+            status: 'ACTIVE',
+            approvalStatus: 'APPROVED',
+        });
+        await user.save();
+
+        return res.status(201).json({
+            success: true,
+            message: 'Patient registered successfully. You can now log in.',
+            data: {
+                userId: user.userId,
+                email: user.email,
+                roles: user.roles,
+                status: user.status,
+                patient: {
+                    UHID: patient.UHID,
+                    name: patient.name,
+                    phone: patient.phone,
+                    email: patient.email,
+                    gender: patient.gender,
+                    age: patient.age,
+                }
+            }
+        });
+    }
+    catch (err) {
+        return handleControllerError(res, err, 'patientRegister');
+    }
+}
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email: email.toLowerCase().trim() })
             .select('+passwordHash +refreshToken')
-            .populate('employeeId', 'employeeCode name designation department email phone specialization');
+            .populate('employeeId', 'employeeCode name designation department email phone specialization')
+            .populate('patientId', 'UHID name phone email gender dob address emergencyContact medicalHistory');
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
@@ -220,6 +297,7 @@ const login = async (req, res) => {
                 roles: user.roles,
                 status: user.status,
                 employee: user.employeeId || null,
+                patient: user.patientId || null,
                 lastLoginAt: user.lastLoginAt,
                 tokens: { accessToken, refreshToken },
             },
@@ -233,7 +311,8 @@ const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate(
             'employeeId',
-            'employeeCode name designation department email phone specialization qualification consultationFee'
+            'employeeCode name designation department email phone specialization qualification consultationFee',
+            'patientId', 'UHID name phone email gender address emergencyContact medicalHistory'
         );
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -248,6 +327,7 @@ const getMe = async (req, res) => {
                 status: user.status,
                 approvalStatus: user.approvalStatus,
                 employee: user.employeeId || null,
+                patient: user.patientId || null,
                 lastLoginAt: user.lastLoginAt,
                 createdAt: user.createdAt,
             },
@@ -319,4 +399,4 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = { register, selfRegister, login, getMe, forgotPassword, resetPassword, changePassword };
+module.exports = { register, selfRegister, patientRegister, login, getMe, forgotPassword, resetPassword, changePassword };

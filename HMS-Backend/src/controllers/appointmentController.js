@@ -21,7 +21,13 @@ const CREATOR_FIELDS = 'email userId';
 
 const isAdmin = (user) => user.roles.some((r) => ADMIN_ROLES.has(r));
 
-const creatorFilter = (user) => (isAdmin(user) ? {} : { createdByEmployeeId: user.id });
+const creatorFilter = (user) => {
+    if (isAdmin(user)) return {};
+    if (user.roles.includes('PATIENT')) {
+        return { patientId: user.patientId };
+    }
+    return { createdByEmployeeId: user.id };
+}
 
 const handleError = (res, error, context) => {
     console.error(`[${context}]`, error.message);
@@ -245,11 +251,17 @@ exports.getDoctorAppointments = async (req, res) => {
 exports.getPatientAppointments = async (req, res) => {
     try {
         const { patientId } = req.params;
+        if (req.user.roles.includes('PATIENT') && req.user.patientId.toString() !== patientId) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only view your own appointments.' });
+        }
 
         const patient = await Patient.findById(patientId);
         if (!patient) return res.status(404).json({ success: false, message: 'Patient not found' });
 
-        const filter = { patientId, ...creatorFilter(req.user) };
+        const filter = { patientId};
+        if (!req.user.roles.includes('PATIENT') && !isAdmin(req.user)) {
+            filter.createdByEmployeeId = req.user.id;
+        }
 
         const appointments = await Appointment.find(filter)
             .populate('doctorEmployeeId', `${DOCTOR_FIELDS}`)

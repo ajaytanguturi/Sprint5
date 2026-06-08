@@ -44,7 +44,7 @@ router.post('/', authorize('RECEPTIONIST', 'NURSE', 'ADMIN', 'OWNER'), createRul
 router.get('/', authorize('RECEPTIONIST', 'NURSE', 'ADMIN', 'OWNER'), getAllPatients);
 router.get('/search', authorize('RECEPTIONIST', 'NURSE', 'ADMIN', 'OWNER'), searchPatients);
 router.get('/:id', getPatientById);
-router.put('/:id', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), updateRules, validate, updatePatient);
+router.put('/:id', authorize('RECEPTIONIST', 'ADMIN', 'OWNER', 'PATIENT'), updateRules, validate, updatePatient);
 router.delete('/:id', authorize('ADMIN', 'OWNER'), deletePatient);
 
 module.exports = router;

@@ -74,14 +74,14 @@ const notesRules = [
 
 router.use(protect);
 
-router.get('/doctors/available', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), getAvailableDoctors);
-router.get('/doctors/:doctorId/slots', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), getAvailableSlots);
+router.get('/doctors/available', authorize('RECEPTIONIST', 'ADMIN', 'OWNER','PATIENT'), getAvailableDoctors);
+router.get('/doctors/:doctorId/slots', authorize('RECEPTIONIST', 'ADMIN', 'OWNER', 'PATIENT'), getAvailableSlots);
 router.get('/today', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), getTodayAppointments);
 router.get('/my', authorize('DOCTOR'), getMyAppointments);
 router.get('/doctor/:doctorId', authorize('ADMIN', 'NURSE', 'OWNER'), getDoctorAppointments);
-router.get('/patient/:patientId', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), getPatientAppointments);
+router.get('/patient/:patientId', authorize('RECEPTIONIST', 'ADMIN', 'OWNER', 'PATIENT'), getPatientAppointments);
 
-router.post('/', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), createRules, validate, createAppointment);
+router.post('/', authorize('RECEPTIONIST', 'ADMIN', 'OWNER','PATIENT'), createRules, validate, createAppointment);
 router.get('/', authorize('RECEPTIONIST', 'ADMIN', 'OWNER'), getAllAppointments);
 
 router.get('/:id', getAppointmentById);

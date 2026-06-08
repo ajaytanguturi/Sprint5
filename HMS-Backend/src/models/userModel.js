@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
         roles: {
             type: [String],
             enum: {
-                values: ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST'],
+                values: ['OWNER', 'ADMIN', 'DOCTOR', 'RECEPTIONIST', 'CASHIER', 'NURSE', 'LAB_TECH', 'PHARMACIST', 'PATIENT'],
                 message: 'Invalid role provided',
             },
             required: [true, 'At least one role is required'],
@@ -39,6 +39,11 @@ const userSchema = new mongoose.Schema(
         employeeId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Employee',
+            default: null,
+        },
+        patientId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Patient',
             default: null,
         },
         approvalStatus: {
@@ -84,13 +89,21 @@ userSchema.pre('save', async function () {
 });
 
 userSchema.pre('save', function () {
+    const roles = this.roles || [];
     const isAdminLevel = this.roles.some(
         (r) => r === 'OWNER' || r === 'ADMIN'
     );
-    if (!isAdminLevel && !this.employeeId) {
-        throw new Error(
-            `employeeId is required for roles: ${this.roles.join(', ')}`
-        );
+    const isPatient = roles.some((r) => r === 'PATIENT');
+    if (!isAdminLevel) {
+        if (isPatient) {
+            if (!this.patientId) {
+                throw new Error('PatientId is required for Patient roles');
+            }
+        } else {
+            if (!this.employeeId) {
+                throw new Error(`employeeId is required for ${roles.join(', ')}`);
+            }
+        }
     }
 });
 
