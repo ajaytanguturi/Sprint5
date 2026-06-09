@@ -45,7 +45,7 @@ export class AdminCreateEmployeeComponent {
     this.createForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(10)]],
       department: ['', [Validators.required]],
       designation: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
       roles: ['', Validators.required],

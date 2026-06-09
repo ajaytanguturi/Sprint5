@@ -34,8 +34,8 @@ export class RegisterComponent {
   availabilityChips: string[] = [];
   newAvailabilitySlot = '';
 
-  passwordStrength = '';
-  passwordStrengthColor = 'red';
+  Strength = '';
+  strengthColor = 'red';
 
   commonTimeSlots = [
     '09:00-12:00',
@@ -52,7 +52,7 @@ export class RegisterComponent {
       {
         name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
         email: ['', [Validators.required, Validators.email]],
-        phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
+        phone: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(10)]],
         department: ['', Validators.required],
         designation: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
         roles: ['', Validators.required],
@@ -82,23 +82,23 @@ export class RegisterComponent {
       case 0:
       case 1:
       case 2:
-        this.passwordStrength = 'Weak';
-        this.passwordStrengthColor = 'red';
+        this.Strength = 'Weak';
+        this.strengthColor = 'red';
         break;
 
       case 3:
       case 4:
-        this.passwordStrength = 'Medium';
-        this.passwordStrengthColor = 'orange';
+        this.Strength = 'Medium';
+        this.strengthColor = 'orange';
         break;
 
       case 5:
-        this.passwordStrength = 'Strong';
-        this.passwordStrengthColor = 'green';
+        this.Strength = 'Strong';
+        this.strengthColor = 'green';
         break;
 
       default:
-        this.passwordStrength = '';
+        this.Strength = '';
     }
   }
   passwordMatchValidator(control: AbstractControl) {

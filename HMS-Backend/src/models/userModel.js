@@ -90,20 +90,19 @@ userSchema.pre('save', async function () {
 
 userSchema.pre('save', function () {
     const roles = this.roles || [];
-    const isAdminLevel = this.roles.some(
+    const isAdminLevel = this.roles.includes(
         (r) => r === 'OWNER' || r === 'ADMIN'
     );
-    const isPatient = roles.some((r) => r === 'PATIENT');
+    const isPatient = roles.includes((r) => r === 'PATIENT');
     if (!isAdminLevel) {
         if (isPatient) {
             if (!this.patientId) {
                 throw new Error('PatientId is required for Patient roles');
             }
-        } else {
-            if (!this.employeeId) {
-                throw new Error(`employeeId is required for ${roles.join(', ')}`);
-            }
+        } else if (!this.employeeId) {
+            throw new Error(`employeeId is required for ${roles.join(', ')}`);
         }
+
     }
 });
 

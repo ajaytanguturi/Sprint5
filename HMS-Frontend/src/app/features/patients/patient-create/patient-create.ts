@@ -29,7 +29,7 @@ export class PatientCreateComponent {
   constructor() {
     this.patientForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]+$/)]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/), Validators.minLength(10), Validators.maxLength(10)]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.minLength(10), Validators.maxLength(10)]],
       email: ['', [Validators.required, Validators.email]],
       gender: ['', Validators.required],
       dob: ['', Validators.required, this.futureDateValidator()],
