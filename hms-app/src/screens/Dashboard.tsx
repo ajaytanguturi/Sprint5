@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config/apiConfig';
 import DashboardStyles from '../styles/DashboardStyles';
@@ -9,6 +10,7 @@ const Dashboard = ({ navigation }: any) => {
     const { user, token } = useAuth();
     const [appointments, setAppointments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const isFocused = useIsFocused(); //to check the screen is active or focused
 
     const fetchAppointments = async () => {
         if (!user || !user.patient || !token) return;
@@ -28,8 +30,10 @@ const Dashboard = ({ navigation }: any) => {
     };
 
     useEffect(() => {
-        fetchAppointments();
-    }, []);
+        if (isFocused) {
+            fetchAppointments();
+        }
+    }, [isFocused]);
 
     const patientName = user?.patient?.name || 'Patient';
     const nextAppt = appointments.find(appt => appt.status === 'BOOKED');
@@ -92,10 +96,10 @@ const Dashboard = ({ navigation }: any) => {
             {/* Quick Actions */}
             <Text style={DashboardStyles.sectionTitle}>Quick Actions</Text>
             <View style={DashboardStyles.actionsRow}>
-                <TouchableOpacity style={DashboardStyles.actionBtn} onPress={() => navigation.navigate('Appointments')}>
+                <TouchableOpacity style={DashboardStyles.actionBtn} onPress={() => navigation.navigate('AppointmentsTab')}>
                     <Text style={DashboardStyles.actionBtnText}>View Bookings</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={DashboardStyles.actionBtn} onPress={() => navigation.navigate('Profile')}>
+                <TouchableOpacity style={DashboardStyles.actionBtn} onPress={() => navigation.navigate('ProfileTab')}>
                     <Text style={DashboardStyles.actionBtnText}>Update Profile</Text>
                 </TouchableOpacity>
             </View>
