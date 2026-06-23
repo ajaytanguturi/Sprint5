@@ -1,0 +1,482 @@
+const User = require("../models/Users");
+const Employee = require("../models/Employees");
+const Appointment = require("../models/Appointments");
+const AuditLog = require("../models/AuditLogs");
+const ProfileChangeRequest = require("../models/ProfileChangeRequests");
+const emailTemplates = require("../utils/emailTemplates");
+const sendEmail = require("../utils/sendEmail");
+const buildEmployeeResponse = require("../utils/buildEmployeeResponse");
+const buildEmployeeProfile = require("../utils/buildEmployeeProfile");
+const updateEmployeeData = require("../utils/updateEmployeeData");
+const recordAudit = require("../utils/recordAudit");
+const resolveActor = require("../utils/resolveActor");
+const deleteEmployeeAccount = require("../utils/deleteEmployeeAccount");
+const cancelOutOfScheduleAppointments = require("../utils/cancelOutOfScheduleAppointments");
+const hasFieldChanges = require("../utils/hasFieldChanges");
+const createAccountWithEmployee = require("../utils/createAccountWithEmployee");
+const parsePagination = require("../utils/parsePagination");
+const { RESTRICTED_ROLES_SET } = require("../constants/domain");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
+const STATUS = require("../constants/statusCodes");
+const MESSAGES = require("../constants/messages");
+
+// Editable employee fields + how to compare them for no-op detection
+const EMPLOYEE_UPDATABLE_FIELDS = [
+  "name",
+  "phone",
+  "department",
+  "designation",
+  "joiningDate",
+  "qualification",
+  "medicalRegistrationNumber",
+  "specialization",
+  "consultationFee",
+  "availabilitySlots",
+  "bookingCutoffDate",
+];
+const EMPLOYEE_CHANGE_OPTIONS = {
+  dateFields: ["joiningDate", "bookingCutoffDate"],
+  arrayKeys: { availabilitySlots: ["day", "startTime", "endTime"] },
+};
+
+// Fetch all STAFF users with a given status and their linked employee records
+const getEmployeesByStatus = async (status, res) => {
+  const users = await User.find({ roles: "STAFF", status }).select("-passwordHash");
+  const employeeCodes = users.map((user) => user.employeeCode);
+  const employees = await Employee.find({ employeeCode: { $in: employeeCodes } });
+  const formattedEmployees = buildEmployeeResponse(employees, users);
+  return sendSuccess(res, STATUS.OK, MESSAGES.EMPLOYEE.LIST_RETRIEVED, {
+    totalEmployees: formattedEmployees.length,
+    employees: formattedEmployees,
+  });
+};
+
+// Lookup a profile change request and guard that it is still PENDING
+const findPendingRequest = async (requestId) => {
+  const request = await ProfileChangeRequest.findOne({ requestId });
+  if (!request) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.ADMIN.CHANGE_REQUEST_NOT_FOUND);
+  }
+  if (String(request.status) !== "PENDING") {
+    throw new AppError(STATUS.BAD_REQUEST, MESSAGES.ADMIN.CHANGE_REQUEST_REVIEWED);
+  }
+  return request;
+};
+
+// Create a new STAFF employee account with a temporary password
+exports.createEmployee = async (req, res) => {
+  const { designation } = req.body;
+
+  if (RESTRICTED_ROLES_SET.has(designation)) {
+    throw new AppError(STATUS.FORBIDDEN, MESSAGES.AUTH.INVALID_DESIGNATION);
+  }
+
+  const { employee, user } = await createAccountWithEmployee(req, { // NOSONAR: false positive; function is async but Sonar loses type info across CommonJS require
+    roles: ["STAFF"],
+    emailTemplate: emailTemplates.employeeCredentials,
+    auditAction: "EMPLOYEE_CREATED",
+    buildAuditMessage: (emp) =>
+      MESSAGES.AUDIT.EMPLOYEE_CREATED(emp.name, emp.employeeCode, emp.designation),
+  });
+
+  return sendSuccess(res, STATUS.CREATED, MESSAGES.ADMIN.EMPLOYEE_CREATED, {
+    user: {
+      username: user.username,
+      email: user.email,
+      roles: user.roles,
+    },
+    employee: {
+      employeeCode: employee.employeeCode,
+      name: employee.name,
+      department: employee.department,
+      designation: employee.designation,
+    },
+  });
+};
+
+// Fetch a single employee profile
+exports.getEmployee = async (req, res) => {
+  const { employeeCode } = req.params;
+
+  const employee = await Employee.findOne({ employeeCode });
+  if (!employee) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.EMPLOYEE.NOT_FOUND);
+  }
+
+  const user = await User.findOne({ employeeCode }).select("-passwordHash");
+  if (!user) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.AUTH.USER_NOT_FOUND);
+  }
+
+  const profile = buildEmployeeProfile(employee);
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.EMPLOYEE.RETRIEVED, {
+    employee: profile,
+    status: user.status,
+    roles: user.roles,
+    lastLoginAt: user.lastLoginAt,
+  });
+};
+
+// List all active STAFF employees
+exports.getEmployees = async (req, res) =>
+  getEmployeesByStatus("ACTIVE", res);
+
+// List STAFF employees with PENDING account status awaiting approval
+exports.getPendingEmployees = async (req, res) =>
+  getEmployeesByStatus("PENDING", res);
+
+// Approve a self-registered employee
+exports.approveEmployee = async (req, res) => {
+  const employeeCode = req.params.employeeCode;
+
+  const user = await User.findOne({
+    employeeCode,
+  });
+
+  if (!user) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.AUTH.USER_NOT_FOUND);
+  }
+
+  if (user.roles.some((role) => RESTRICTED_ROLES_SET.has(role))) {
+    throw new AppError(STATUS.FORBIDDEN, MESSAGES.ADMIN.ONLY_STAFF_APPROVED);
+  }
+
+  if (String(user.status) !== "PENDING") {
+    throw new AppError(STATUS.BAD_REQUEST, MESSAGES.ADMIN.STATUS_NOT_PENDING);
+  }
+
+  user.status = "ACTIVE";
+  user.approvedBy = req.user.employeeCode;
+  user.approvedAt = new Date();
+
+  await user.save();
+
+  // Notify the employee that their account has been approved (best-effort)
+  try {
+    await sendEmail({
+      to: user.email,
+      ...emailTemplates.accountApproved(),
+    });
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+  }
+
+  // Log the approval action
+  const actor = await resolveActor(req.user);
+  await recordAudit({
+    actor,
+    action: "EMPLOYEE_APPROVED",
+    targetType: "EMPLOYEE",
+    targetId: user.employeeCode,
+    message: MESSAGES.AUDIT.EMPLOYEE_APPROVED(user.employeeCode, user.username)
+  });
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.ACCOUNT_APPROVED, {
+    user: {
+      username: user.username,
+      email: user.email,
+    },
+  });
+};
+
+// Reject a self-registration request
+exports.rejectEmployee = async (req, res) => {
+  const employeeCode = req.params.employeeCode;
+
+  const user = await User.findOne({
+    employeeCode,
+  });
+
+  if (!user) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.AUTH.USER_NOT_FOUND);
+  }
+
+  if (user.roles.some((role) => RESTRICTED_ROLES_SET.has(role))) {
+    throw new AppError(STATUS.FORBIDDEN, MESSAGES.ADMIN.ONLY_STAFF_REJECTED);
+  }
+
+  if (String(user.status) !== "PENDING") {
+    throw new AppError(STATUS.BAD_REQUEST, MESSAGES.ADMIN.STATUS_NOT_PENDING);
+  }
+
+  // Email before deletion so the address is still reachable (best-effort)
+  try {
+    await sendEmail({
+      to: user.email,
+      ...emailTemplates.accountRejected(),
+    });
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+  }
+
+  // Log the rejection before the record is removed
+  const actor = await resolveActor(req.user);
+
+  await recordAudit({
+    actor,
+    action: "EMPLOYEE_REJECTED",
+    targetType: "EMPLOYEE",
+    targetId: employeeCode,
+    message: MESSAGES.AUDIT.EMPLOYEE_REGISTRATION_REJECTED(employeeCode, user.username),
+  });
+
+  // Soft-delete the account (marked REJECTED) so the email/username free up for re-registration
+  await deleteEmployeeAccount(employeeCode, actor.employeeCode, { userStatus: "REJECTED" });
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.REGISTRATION_REJECTED);
+};
+
+// Normalized availability fingerprint for change detection (subdoc _ids churn on assignment)
+const availabilityKey = (slots) =>
+  (slots || []).map((s) => `${s.day} ${s.startTime}-${s.endTime}`).sort().join("|");
+
+// Update mutable fields on a STAFF employee record
+exports.updateEmployee = async (req, res) => {
+  const { employeeCode } = req.params;
+
+  const employee = await Employee.findOne({
+    employeeCode,
+  });
+
+  if (!employee) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.EMPLOYEE.NOT_FOUND);
+  }
+
+  if (RESTRICTED_ROLES_SET.has(employee.designation)) {
+    throw new AppError(STATUS.FORBIDDEN, MESSAGES.ADMIN.CANNOT_UPDATE_PRIVILEGED);
+  }
+
+  // Reject no-op updates so no false audit log is written
+  if (!hasFieldChanges(employee, req.body, EMPLOYEE_UPDATABLE_FIELDS, EMPLOYEE_CHANGE_OPTIONS)) {
+    throw new AppError(STATUS.BAD_REQUEST, MESSAGES.COMMON.NO_CHANGES);
+  }
+
+  const beforeAvailability = availabilityKey(employee.availabilitySlots);
+
+  updateEmployeeData(employee, req.body);
+
+  await employee.save();
+
+  // Log the update
+  const actor = await resolveActor(req.user);
+  await recordAudit({
+    actor,
+    action: "EMPLOYEE_UPDATED",
+    targetType: "EMPLOYEE",
+    targetId: employee.employeeCode,
+    message: MESSAGES.AUDIT.EMPLOYEE_UPDATED(employee.name, employee.employeeCode)
+  });
+
+  // Schedule change: cancel future booked appointments that no longer fit
+  if (availabilityKey(employee.availabilitySlots) !== beforeAvailability) {
+    await cancelOutOfScheduleAppointments(employee, actor);
+  }
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.EMPLOYEE_UPDATED, {
+    employee: {
+      employeeCode: employee.employeeCode,
+      name: employee.name,
+      department: employee.department,
+      designation: employee.designation,
+    },
+  });
+};
+
+// Soft-delete a STAFF employee and their linked user account
+exports.deleteEmployee = async (req, res) => {
+
+  const employeeCode = req.params.employeeCode;
+
+  const employee = await Employee.findOne({
+    employeeCode,
+  });
+
+  if (!employee) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.EMPLOYEE.NOT_FOUND);
+  }
+
+  if (RESTRICTED_ROLES_SET.has(employee.designation)) {
+    throw new AppError(STATUS.FORBIDDEN, MESSAGES.ADMIN.CANNOT_DELETE_PRIVILEGED);
+  }
+
+  // A doctor with scheduled (BOOKED) appointments cannot be deleted. Set a booking
+  // cutoff date so bookings wind down, then delete once none remain BOOKED.
+  if (employee.designation === "DOCTOR") {
+    const bookedCount = await Appointment.countDocuments({
+      doctorEmployeeId: employeeCode,
+      status: "BOOKED",
+    });
+
+    if (bookedCount > 0) {
+      throw new AppError(STATUS.CONFLICT, MESSAGES.EMPLOYEE.DOCTOR_HAS_BOOKED_APPOINTMENTS);
+    }
+  }
+
+  // Log before deletion so the record still exists for the message
+  const actor = await resolveActor(req.user);
+  await recordAudit({
+    actor,
+    action: "EMPLOYEE_DELETED",
+    targetType: "EMPLOYEE",
+    targetId: employeeCode,
+    message: MESSAGES.AUDIT.EMPLOYEE_DELETED(employee.name, employeeCode)
+  });
+
+  await deleteEmployeeAccount(employeeCode, actor.employeeCode);
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.EMPLOYEE_DELETED);
+};
+
+// Fetch paginated audit log entries with optional action filter
+exports.getAuditLogs = async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query, 20);
+
+  const filter = {};
+
+  if (req.query.action) {
+    filter.action = req.query.action;
+  }
+
+  const [logs, total] = await Promise.all([
+    AuditLog.find(filter)
+      .select("-__v")
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    AuditLog.countDocuments(filter),
+  ]);
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.AUDIT_LOGS_RETRIEVED, {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+    logs,
+  });
+};
+
+// List all pending profile change requests
+exports.getProfileChangeRequests = async (req, res) => {
+  const requests = await ProfileChangeRequest.find({
+    status: "PENDING",
+  })
+    .select("-__v")
+    .sort({ created_at: -1 })
+    .lean();
+
+  // Normalize the Map field to a plain object for JSON serialization
+  const formatted = requests.map((request) => ({
+    ...request,
+    requestedChanges: request.requestedChanges || {},
+  }));
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.CHANGE_REQUESTS_RETRIEVED, {
+    total: formatted.length,
+    requests: formatted,
+  });
+};
+
+// Approve profile change request
+exports.approveProfileChange = async (req, res) => {
+  const { requestId } = req.params;
+
+  // Throws AppError when missing or already reviewed
+  const request = await findPendingRequest(requestId);
+
+  const employee = await Employee.findOne({
+    employeeCode: request.employeeCode,
+  });
+
+  if (!employee) {
+    throw new AppError(STATUS.NOT_FOUND, MESSAGES.EMPLOYEE.NOT_FOUND);
+  }
+
+  request.requestedChanges.forEach((change, field) => {
+    employee[field] = change.new;
+  });
+
+  await employee.save();
+
+  request.status = "APPROVED";
+  request.reviewedBy = req.user.employeeCode;
+  request.reviewedAt = new Date();
+  await request.save();
+
+  // Notify the employee of approval (best-effort)
+  try {
+    await sendEmail({
+      to: employee.email,
+      ...emailTemplates.profileChangeApproved(),
+    });
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+  }
+
+  // Log the approval
+  const actor = await resolveActor(req.user);
+  await recordAudit({
+    actor,
+    action: "PROFILE_CHANGE_APPROVED",
+    targetType: "PROFILE_CHANGE_REQUEST",
+    targetId: request.requestId,
+    message: MESSAGES.AUDIT.PROFILE_CHANGE_APPROVED(
+      request.requestId,
+      employee.name,
+      employee.employeeCode
+    ),
+  });
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.CHANGE_REQUEST_APPROVED, {
+    request: {
+      requestId: request.requestId,
+      status: request.status,
+    },
+  });
+};
+
+// Reject a profile change request
+exports.rejectProfileChange = async (req, res) => {
+  const { requestId } = req.params;
+
+  // Throws AppError when missing or already reviewed
+  const request = await findPendingRequest(requestId);
+
+  request.status = "REJECTED";
+  request.reviewedBy = req.user.employeeCode;
+  request.reviewedAt = new Date();
+  await request.save();
+
+  // Notify the employee of rejection (best-effort)
+  try {
+    await sendEmail({
+      to: request.email,
+      ...emailTemplates.profileChangeRejected(),
+    });
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+  }
+
+  // Log the rejection
+  const actor = await resolveActor(req.user);
+  await recordAudit({
+    actor,
+    action: "PROFILE_CHANGE_REJECTED",
+    targetType: "PROFILE_CHANGE_REQUEST",
+    targetId: request.requestId,
+    message: MESSAGES.AUDIT.PROFILE_CHANGE_REJECTED(
+      request.requestId,
+      request.employeeName,
+      request.employeeCode
+    ),
+  });
+
+  return sendSuccess(res, STATUS.OK, MESSAGES.ADMIN.CHANGE_REQUEST_REJECTED, {
+    request: {
+      requestId: request.requestId,
+      status: request.status,
+    },
+  });
+};
