@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const validate = require("../middlewares/validate");
 const patientAuth = require("../middlewares/patientAuthMiddleware");
-//const { loginLimiter, passwordResetLimiter } = require("../middlewares/rateLimiters");
+const { loginLimiter, passwordResetLimiter } = require("../middlewares/rateLimiters");
 const controller = require("../controllers/patientAuthController");
 const {
     patientRegisterValidation,
@@ -22,7 +22,7 @@ router.post(
 
 router.post(
     "/login",
-    //loginLimiter,
+    loginLimiter,
     patientLoginValidation,
     validate,
     controller.login
@@ -30,7 +30,7 @@ router.post(
 
 router.post(
     "/forgot-password",
-    //passwordResetLimiter,
+    passwordResetLimiter,
     patientForgotPasswordValidation,
     validate,
     controller.forgotPassword
@@ -38,7 +38,7 @@ router.post(
 
 router.post(
     "/reset-password",
-    //passwordResetLimiter,
+    passwordResetLimiter,
     patientResetPasswordValidation,
     validate,
     controller.resetPassword

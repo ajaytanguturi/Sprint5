@@ -56,6 +56,18 @@ const FILTERS: Filter[] = [
   "UNATTENDED",
 ];
 
+// True once the appointment's slot start time has passed. Past this point cancel
+// and reschedule are no longer allowed (mirrors the Angular web + backend guard).
+function startTimePassed(appt: Appointment): boolean {
+  const start = (appt.timeSlot || "").split("-")[0];
+  const [hh, mm] = (start || "").split(":").map(Number);
+  const startAt = new Date(appt.appointmentDate);
+  if (!Number.isNaN(hh) && !Number.isNaN(mm)) {
+    startAt.setHours(hh, mm, 0, 0);
+  }
+  return startAt.getTime() <= Date.now();
+}
+
 // Optimistically flip a single appointment to CANCELED across all cached pages.
 // Extracted so the mutation's onMutate stays shallow (avoids deep callback nesting).
 function markAppointmentCanceled(
@@ -213,7 +225,7 @@ export default function AppointmentsScreen() {
         appointment={appt}
         statusColor={STATUS_COLORS[appt.status]}
       >
-        {appt.status === "BOOKED" && (
+        {appt.status === "BOOKED" && !startTimePassed(appt) && (
           <View style={styles.actionRow}>
             <TouchableOpacity
               style={styles.cancelButton}

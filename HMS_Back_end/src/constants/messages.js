@@ -194,7 +194,7 @@ const MESSAGES = Object.freeze({
     AUDIT: Object.freeze({
         USER_LOGIN: (id) => `Login successful for ${id}`,
         USER_LOGIN_FAILED: (email) => `Failed login attempt for ${email}`,
-        USER_LOGOUT: (id) => `Logout for ${id}`,
+        USER_LOGOUT: (id) => `${id} has logged out`,
         PASSWORD_CHANGED: (id) => `Password changed for ${id}`, // NOSONAR not a credential
         PASSWORD_RESET_REQUESTED: (id) => `Password reset requested for ${id}`, // NOSONAR not a credential
         PASSWORD_RESET_COMPLETED: (id) => `Password reset completed for ${id}`, // NOSONAR not a credential

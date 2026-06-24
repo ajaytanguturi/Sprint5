@@ -3,7 +3,8 @@ const router = express.Router();
 const { body } = require("express-validator");
 const validate = require("../middlewares/validate");
 const auth = require("../middlewares/authMiddleware");
-//const { loginLimiter, passwordResetLimiter } = require("../middlewares/rateLimiters");
+const authOptional = require("../middlewares/optionalAuthMiddleware");
+const { loginLimiter, passwordResetLimiter } = require("../middlewares/rateLimiters");
 const controller = require("../controllers/authController");
 const {
   employeeBaseValidators,
@@ -57,7 +58,7 @@ const resetPasswordValidation = [
 ];
 
 // Auth routes
-router.post("/login", loginValidation, validate, controller.login); //loginLimiter
+router.post("/login", loginLimiter, loginValidation, validate, controller.login);
 
 router.post(
   "/self-register",
@@ -76,7 +77,7 @@ router.put(
 
 router.post(
   "/forgot-password",
-  //passwordResetLimiter,
+  passwordResetLimiter,
   forgotPasswordValidation,
   validate,
   controller.forgotPassword,
@@ -84,15 +85,17 @@ router.post(
 
 router.post(
   "/reset-password",
-  // passwordResetLimiter,
+  passwordResetLimiter,
   resetPasswordValidation,
   validate,
   controller.resetPassword,
 );
 
-// Logout/refresh take the refresh token in the body, so they must work even
-// after the short-lived access token has already expired (no auth middleware)
-router.post("/logout", controller.logout);
+// Logout must work even after the access token expires (refresh token in the
+// cookie), so auth is optional — when an access token is present it gives the
+// reliable employee identity for the audit, since the cookie can be dropped by
+// the browser's SameSite rules on cross-site requests
+router.post("/logout", authOptional, controller.logout);
 
 router.post("/refresh", controller.refresh);
 

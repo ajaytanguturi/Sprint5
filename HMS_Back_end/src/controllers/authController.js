@@ -317,21 +317,26 @@ exports.logout = async (req, res) => {
     const refreshToken = req.cookies?.refreshToken;
     const tokenHash = refreshToken ? hashToken(refreshToken) : null;
 
-    // This route has no auth middleware, so identity comes from the token itself.
-    // Look it up regardless of revocation state so an already-revoked token still
-    // names its owner.
-    const record = tokenHash ? await findByHash(tokenHash) : null;
+    // Prefer the authenticated employee from the access token (optionalAuth): the
+    // tab clicking logout is still logged in, and its Bearer header is sent even
+    // when SameSite rules drop the refresh cookie. Fall back to the refresh-token
+    // owner (looked up regardless of revocation state) when no access token.
+    let subjectId = req.user?.employeeCode || null;
+    if (!subjectId && tokenHash) {
+        const record = await findByHash(tokenHash);
+        subjectId = record?.subjectId ?? null;
+    }
 
-    // Audit only when we can attribute the logout to a subject; an absent or
-    // unknown token tells us nothing about who left, so we skip the entry rather
-    // than record a meaningless "unknown" logout. Revocation stays decoupled below.
-    if (record) {
+    // Audit whenever we can attribute the logout to a subject; only the truly
+    // unidentifiable (no access token and no known refresh token) is skipped,
+    // so we never record a meaningless "unknown" logout. Revocation stays decoupled.
+    if (subjectId) {
         await recordAudit({
             actorType: "EMPLOYEE",
-            actorId: record.subjectId,
+            actorId: subjectId,
             action: "USER_LOGOUT",
             ipAddress: req.ip,
-            message: MESSAGES.AUDIT.USER_LOGOUT(record.subjectId)
+            message: MESSAGES.AUDIT.USER_LOGOUT(subjectId)
         });
     }
 

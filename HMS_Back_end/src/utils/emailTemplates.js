@@ -8,6 +8,15 @@ const frontendUrl = () => {
 
 const loginUrl = () => `${frontendUrl()}/login`;
 
+// Patient mobile app deep-link base (Expo custom scheme). A trailing slash is
+// ensured so paths append cleanly, e.g. hmsapp://login.
+const patientAppUrl = () => {
+  const url = process.env.PATIENT_APP_URL || "hmsapp://";
+  return url.endsWith("/") ? url : `${url}/`;
+};
+
+const patientLoginUrl = () => `${patientAppUrl()}login`;
+
 // Shared wrapper so every email has a consistent signature/branding
 const wrap = (innerHtml) => `
   ${innerHtml}
@@ -21,6 +30,13 @@ const wrap = (innerHtml) => `
 const loginButton = (label = "Login to HMS") => `
   <p>
     <a href="${loginUrl()}">${label}</a>
+  </p>
+`;
+
+// Login link for patient emails — opens the patient mobile app, not the staff web
+const patientLoginButton = (label = "Open the HMS App") => `
+  <p>
+    <a href="${patientLoginUrl()}">${label}</a>
   </p>
 `;
 
@@ -72,7 +88,7 @@ const patientCredentials = ({ email, temporaryPassword }) => ({
     <p><strong>Email:</strong> ${email}</p>
     <p><strong>Temporary Password:</strong> ${temporaryPassword}</p>
     <p>Please login using the link below and change your password immediately.</p>
-    ${loginButton("Patient Login")}
+    ${patientLoginButton("Patient Login")}
   `),
 });
 
@@ -212,7 +228,7 @@ const diagnosisReportAvailable = ({ patientName }) => ({
     <h2>Diagnosis Report Available</h2>
     ${patientName ? `<p>Dear ${patientName},</p>` : ""}
     <p>Your diagnosis report has been completed. Please log in to the application to view your medical record details.</p>
-    ${loginButton("Patient Login")}
+    ${patientLoginButton("Patient Login")}
   `),
 });
 
@@ -303,6 +319,8 @@ const patientPasswordResetCode = ({ resetCode }) => ({
 module.exports = {
   frontendUrl,
   loginUrl,
+  patientAppUrl,
+  patientLoginUrl,
   employeeCredentials,
   adminCredentials,
   patientCredentials,
