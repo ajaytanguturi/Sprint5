@@ -46,8 +46,7 @@ type AvailabilityCalendarProps = Readonly<{
 
 type DayCell = { iso: string; day: number; selectable: boolean } | null;
 
-// Month-grid date picker that only enables the doctor's available weekdays and
-// hides dates before min, after max, or on/after the booking cutoff.
+// Month grid date picker that enables only the doctor available weekdays and hides dates outside the allowed range
 export default function AvailabilityCalendar({
   visible,
   value,

@@ -97,8 +97,7 @@ async function refreshAccessToken(): Promise<string> {
   return refreshPromise;
 }
 
-// Fetch wrapper; prefixes base URL, attaches the access token, transparently
-// refreshes it once on a 401, unwraps the envelope, and throws ApiError
+// Fetch wrapper that prefixes the base URL attaches the access token refreshes once on a 401 unwraps the envelope and throws ApiError
 export async function apiFetch<T = any>(
   path: string,
   { method = "GET", body, auth = true }: ApiOptions = {},

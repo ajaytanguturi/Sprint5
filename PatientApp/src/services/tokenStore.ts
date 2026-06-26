@@ -1,7 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-// Both tokens live in the device secure store. The access token is short-lived
-// and attached to requests; the refresh token is the durable session anchor.
+// Both tokens live in the device secure store where the access token is short lived and the refresh token is the durable session anchor
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 

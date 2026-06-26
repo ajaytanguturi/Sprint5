@@ -1,12 +1,10 @@
 import { QueryClient } from "@tanstack/react-query";
 import { installQueryLogger } from "./queryLogger";
 
-// How long server data is treated as fresh. Shared with useRefetchOnFocusIfStale
-// so on-focus refetches use the same window as React Query's built-in dedup.
+// How long server data is treated as fresh shared with useRefetchOnFocusIfStale so on focus refetches use the same window
 export const DEFAULT_STALE_TIME = 30 * 1000;
 
-// Shared query client. Server data is cached and deduped across screens so
-// navigating back to a list doesn't refire the same request immediately.
+// Shared query client that caches and dedupes server data across screens so navigating back does not refire the request
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

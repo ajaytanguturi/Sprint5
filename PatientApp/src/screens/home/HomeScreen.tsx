@@ -36,8 +36,7 @@ function getGreeting() {
 export default function HomeScreen() {
   const router = useRouter();
 
-  // Profile + upcoming BOOKED appointments, cached and deduped via React Query.
-  // Errors stay silent here; the dedicated screens surface them in detail.
+  // Profile and upcoming BOOKED appointments cached via React Query while errors stay silent here
   const { data, isLoading, refetch, dataUpdatedAt, fetchStatus } = useQuery({
     queryKey: ["homeSummary"],
     queryFn: async () => {
@@ -61,8 +60,7 @@ export default function HomeScreen() {
   const appointments: Appointment[] = data?.appointments ?? [];
   const loading = isLoading;
 
-  // Refresh on focus so newly booked/cancelled appointments appear — but only
-  // when the cached data has gone stale, so quick tab-switches reuse the cache
+  // Refresh on focus so new or cancelled appointments appear but only when the cached data has gone stale
   useRefetchOnFocusIfStale({ refetch, dataUpdatedAt, fetchStatus });
 
   let appointmentsContent: ReactNode;

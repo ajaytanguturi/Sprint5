@@ -56,8 +56,7 @@ const FILTERS: Filter[] = [
   "UNATTENDED",
 ];
 
-// True once the appointment's slot start time has passed. Past this point cancel
-// and reschedule are no longer allowed (mirrors the Angular web + backend guard).
+// True once the appointment slot start time has passed after which cancel and reschedule are no longer allowed
 function startTimePassed(appt: Appointment): boolean {
   const start = (appt.timeSlot || "").split("-")[0];
   const [hh, mm] = (start || "").split(":").map(Number);
@@ -68,8 +67,7 @@ function startTimePassed(appt: Appointment): boolean {
   return startAt.getTime() <= Date.now();
 }
 
-// Optimistically flip a single appointment to CANCELED across all cached pages.
-// Extracted so the mutation's onMutate stays shallow (avoids deep callback nesting).
+// Optimistically flips a single appointment to CANCELED across all cached pages
 function markAppointmentCanceled(
   data: InfiniteData<AppointmentsData> | undefined,
   id: string,
@@ -119,8 +117,7 @@ export default function AppointmentsScreen() {
     if (query.error) showError(query.error);
   }, [query.error]);
 
-  // Silent background refresh of the active filter on focus — only when stale,
-  // so switching away and back within the window reuses the cached list
+  // Silent background refresh of the active filter on focus only when stale so a quick return reuses the cached list
   useRefetchOnFocusIfStale(query);
 
   // Switching filters just swaps the query key; cached data renders instantly
@@ -162,8 +159,7 @@ export default function AppointmentsScreen() {
     setReason("");
   };
 
-  // Optimistic cancel: flip the row to CANCELED across cached filter pages,
-  // roll back on error, and reconcile with the server on settle.
+  // Optimistic cancel that flips the row to CANCELED across cached pages and rolls back on error then reconciles on settle
   const cancelMutation = useMutation({
     mutationFn: ({ id, cancellationReason }: { id: string; cancellationReason: string }) =>
       cancelAppointment(id, cancellationReason),

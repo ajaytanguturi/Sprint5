@@ -43,8 +43,7 @@ export default function MedicalRecordsScreen() {
     if (query.error) showError(query.error);
   }, [query.error]);
 
-  // Silent background refresh when the screen regains focus — only when stale,
-  // so a quick return reuses the cached list instead of refetching
+  // Silent background refresh on focus only when stale so a quick return reuses the cached list
   useRefetchOnFocusIfStale(query);
 
   const onRefresh = useCallback(async () => {

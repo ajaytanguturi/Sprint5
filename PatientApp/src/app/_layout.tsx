@@ -36,8 +36,7 @@ export default function AppLayout() {
     prepare();
   }, []);
 
-  // Global auth-failure routing: a failed refresh returns to login, while a
-  // temporary-password account is sent to the change-password screen
+  // Global auth failure routing that sends a failed refresh to login and a temporary password account to change password
   useEffect(() => {
     setOnSessionExpired(() => {
       useAuthStore.getState().setLoggedOut();

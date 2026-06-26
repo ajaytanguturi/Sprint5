@@ -20,8 +20,7 @@ import {
 
 const TEAL = "#2e9466";
 
-// Opened when a patient taps a COMPLETED appointment. Shows the finalized medical
-// record, or plain inline text while a draft report is still being prepared.
+// Opened when a patient taps a COMPLETED appointment to show the finalized record or inline text while a draft is prepared
 export default function AppointmentRecordScreen() {
   const router = useRouter();
   const { appointmentId } = useLocalSearchParams<{ appointmentId: string }>();

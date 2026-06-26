@@ -1,13 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 
-// Dev-only TanStack Query logger. Logs every *network* fetch with its duration
-// and a running per-key call count. Cache hits (data served without a fetch)
-// produce no log line — so a shrinking number of "[rq] ... network" lines after
-// navigating is direct evidence that caching/dedup is working.
-//
-// This replaces the web-only @tanstack/react-query-devtools (which can't be
-// imported in a React Native bundle) and the Expo dev-tools plugin (which would
-// require adding expo-dev-client to the build).
+// Dev only TanStack Query logger that logs each network fetch with its duration and per key call count
 export function installQueryLogger(client: QueryClient): void {
   if (!__DEV__) return;
 
