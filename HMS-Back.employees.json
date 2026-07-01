@@ -1,0 +1,182 @@
+[{
+  "_id": {
+    "$oid": "6a27e28f6235ee12a7e3ae51"
+  },
+  "employeeCode": "EMP-000001",
+  "name": "Hospital Owner",
+  "phone": "+91 9876543210",
+  "email": "owner@hospital.com",
+  "department": "Administration",
+  "designation": "OWNER",
+  "joiningDate": {
+    "$date": "2026-06-09T09:53:19.211Z"
+  },
+  "qualification": [
+    "MBA Hospital Administration"
+  ],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a27f684e3ef8f9ee0977d10"
+  },
+  "name": "HMS Admin",
+  "phone": "9493939120",
+  "email": "hmsadmin001@gmail.com",
+  "department": "Administration",
+  "designation": "ADMIN",
+  "joiningDate": {
+    "$date": "2026-06-10T00:00:00.000Z"
+  },
+  "qualification": [
+    "MBA"
+  ],
+  "employeeCode": "EMP-000003",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a27f937e3ef8f9ee0977d13"
+  },
+  "name": "Varshith J",
+  "phone": "9195979278",
+  "email": "v1861965@gmail.com",
+  "department": "OPD",
+  "designation": "DOCTOR",
+  "joiningDate": {
+    "$date": "2026-06-11T00:00:00.000Z"
+  },
+  "medicalRegistrationNumber": "MED-001",
+  "specialization": "Radiology",
+  "qualification": [
+    "MBBS",
+    "MD"
+  ],
+  "consultationFee": 700,
+  "availabilitySlots": [
+    {
+      "day": "MONDAY",
+      "startTime": "09:00",
+      "endTime": "16:00",
+      "_id": {
+        "$oid": "6a2b8a7d69a71258805b50d8"
+      }
+    },
+    {
+      "day": "TUESDAY",
+      "startTime": "09:00",
+      "endTime": "23:30",
+      "_id": {
+        "$oid": "6a2b8a7d69a71258805b50d9"
+      }
+    },
+    {
+      "day": "WEDNESDAY",
+      "startTime": "10:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2b8a7d69a71258805b50da"
+      }
+    },
+    {
+      "day": "THURSDAY",
+      "startTime": "09:00",
+      "endTime": "23:30",
+      "_id": {
+        "$oid": "6a2b8a7d69a71258805b50db"
+      }
+    },
+    {
+      "day": "FRIDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2b8a7d69a71258805b50dc"
+      }
+    }
+  ],
+  "employeeCode": "EMP-000004",
+  "__v": 5
+},
+{
+  "_id": {
+    "$oid": "6a27f9f8e3ef8f9ee0977d3d"
+  },
+  "name": "NathiPriya",
+  "phone": "8885331394",
+  "email": "nathiksrct98@gmail.com",
+  "department": "Reception",
+  "designation": "RECEPTIONIST",
+  "joiningDate": {
+    "$date": "2026-06-11T00:00:00.000Z"
+  },
+  "qualification": [
+    "BSC"
+  ],
+  "employeeCode": "EMP-000005",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2ba6fa052d77fdc807297a"
+  },
+  "name": "Ajay",
+  "phone": "6302677099",
+  "email": "ajaytanguturi1123@gmail.com",
+  "department": "OPD",
+  "designation": "DOCTOR",
+  "joiningDate": {
+    "$date": "2026-06-10T00:00:00.000Z"
+  },
+  "medicalRegistrationNumber": "MED-053",
+  "specialization": "Opthamology",
+  "qualification": [
+    "MBBS",
+    "MD"
+  ],
+  "consultationFee": 799,
+  "availabilitySlots": [
+    {
+      "day": "MONDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2ba6fa052d77fdc807297b"
+      }
+    },
+    {
+      "day": "TUESDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2ba6fa052d77fdc807297c"
+      }
+    },
+    {
+      "day": "WEDNESDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2ba6fa052d77fdc807297d"
+      }
+    },
+    {
+      "day": "FRIDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2ba6fa052d77fdc807297e"
+      }
+    },
+    {
+      "day": "SATURDAY",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "_id": {
+        "$oid": "6a2ba6fa052d77fdc807297f"
+      }
+    }
+  ],
+  "employeeCode": "EMP-000007",
+  "__v": 0
+}]

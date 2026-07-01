@@ -1,0 +1,162 @@
+[{
+  "_id": {
+    "$oid": "6a27e28f6235ee12a7e3ae52"
+  },
+  "username": "owner",
+  "email": "owner@hospital.com",
+  "passwordHash": "$2b$10$e6k.k8k6B2v0Nm7OjeL4yOoVeX9dx7pQv8kvrb4N/Nk6JR1J7J5oa",
+  "status": "ACTIVE",
+  "roles": [
+    "OWNER"
+  ],
+  "employeeCode": "EMP-000001",
+  "mustChangePassword": false,
+  "createdByAdmin": false,
+  "approvedBy": null,
+  "approvedAt": null,
+  "createdBy": null,
+  "resetPasswordTokenHash": null,
+  "resetPasswordTokenExpiry": null,
+  "lastLoginAt": {
+    "$date": "2026-06-24T11:14:29.549Z"
+  },
+  "created_at": {
+    "$date": "2026-06-09T09:53:19.310Z"
+  },
+  "updated_at": {
+    "$date": "2026-06-24T11:14:29.549Z"
+  },
+  "__v": 0,
+  "tokenVersion": 0
+},
+{
+  "_id": {
+    "$oid": "6a27f684e3ef8f9ee0977d11"
+  },
+  "username": "hmsadmin",
+  "email": "hmsadmin001@gmail.com",
+  "passwordHash": "$2b$10$xms/JNGA3xMnYi27BZ/NLOp8xk/ZGAWj0ZQ8drjD0tu5VYC3g/OQK",
+  "status": "ACTIVE",
+  "roles": [
+    "ADMIN"
+  ],
+  "employeeCode": "EMP-000003",
+  "mustChangePassword": false,
+  "createdByAdmin": true,
+  "approvedBy": "EMP-000001",
+  "approvedAt": {
+    "$date": "2026-06-09T11:18:28.091Z"
+  },
+  "createdBy": "EMP-000001",
+  "resetPasswordTokenHash": null,
+  "resetPasswordTokenExpiry": null,
+  "lastLoginAt": {
+    "$date": "2026-06-24T11:06:11.248Z"
+  },
+  "created_at": {
+    "$date": "2026-06-09T11:18:28.092Z"
+  },
+  "updated_at": {
+    "$date": "2026-06-24T11:06:11.249Z"
+  },
+  "__v": 0,
+  "tokenVersion": 0
+},
+{
+  "_id": {
+    "$oid": "6a27f937e3ef8f9ee0977d17"
+  },
+  "username": "varshith",
+  "email": "v1861965@gmail.com",
+  "passwordHash": "$2b$10$JY5whrUHt9xTa1wo3J3Gz.E3GwK67prxyNo6/ixZs7UILqx.tYLk2",
+  "status": "ACTIVE",
+  "roles": [
+    "STAFF"
+  ],
+  "employeeCode": "EMP-000004",
+  "mustChangePassword": false,
+  "createdByAdmin": true,
+  "approvedBy": "EMP-000003",
+  "approvedAt": {
+    "$date": "2026-06-09T11:29:59.172Z"
+  },
+  "createdBy": "EMP-000003",
+  "resetPasswordTokenHash": null,
+  "resetPasswordTokenExpiry": null,
+  "lastLoginAt": {
+    "$date": "2026-06-11T18:01:52.880Z"
+  },
+  "created_at": {
+    "$date": "2026-06-09T11:29:59.172Z"
+  },
+  "updated_at": {
+    "$date": "2026-06-11T18:01:52.881Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a27f9f8e3ef8f9ee0977d3e"
+  },
+  "username": "nathi",
+  "email": "nathiksrct98@gmail.com",
+  "passwordHash": "$2b$10$0mLJqQ2IR3zotdW9naT/qe5mGXIFjQPyQcDm3U6uv0ck4xF339/zW",
+  "status": "ACTIVE",
+  "roles": [
+    "STAFF"
+  ],
+  "employeeCode": "EMP-000005",
+  "mustChangePassword": false,
+  "createdByAdmin": true,
+  "approvedBy": "EMP-000003",
+  "approvedAt": {
+    "$date": "2026-06-09T11:33:12.453Z"
+  },
+  "createdBy": "EMP-000003",
+  "resetPasswordTokenHash": null,
+  "resetPasswordTokenExpiry": null,
+  "lastLoginAt": {
+    "$date": "2026-06-27T05:28:22.150Z"
+  },
+  "created_at": {
+    "$date": "2026-06-09T11:33:12.454Z"
+  },
+  "updated_at": {
+    "$date": "2026-06-27T05:28:22.154Z"
+  },
+  "__v": 0,
+  "tokenVersion": 0
+},
+{
+  "_id": {
+    "$oid": "6a2ba6fa052d77fdc8072980"
+  },
+  "username": "ajaytanguturi",
+  "email": "ajaytanguturi1123@gmail.com",
+  "passwordHash": "$2b$10$8JD66Jpa19ctilFgn801Bu3Unx7vYPcKEIxcJrYyAuhhIM24R/8LO",
+  "status": "ACTIVE",
+  "roles": [
+    "STAFF"
+  ],
+  "employeeCode": "EMP-000007",
+  "mustChangePassword": false,
+  "createdByAdmin": true,
+  "approvedBy": "EMP-000003",
+  "approvedAt": {
+    "$date": "2026-06-12T06:28:10.984Z"
+  },
+  "createdBy": "EMP-000003",
+  "resetPasswordTokenHash": null,
+  "resetPasswordTokenExpiry": null,
+  "lastLoginAt": {
+    "$date": "2026-06-24T10:58:50.186Z"
+  },
+  "created_at": {
+    "$date": "2026-06-12T06:28:10.985Z"
+  },
+  "updated_at": {
+    "$date": "2026-06-24T10:58:50.187Z"
+  },
+  "__v": 0,
+  "tokenVersion": 0
+}]
